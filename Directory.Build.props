@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Yegun Kim (@ibocon)</Authors>
+    <Company>Orchid Project</Company>
+    <Product>Orchid Universal E2EE Clipboard Ecosystem</Product>
+    <Copyright>Copyright (c) 2026 Yegun Kim</Copyright>
+    <RepositoryUrl>https://github.com/ibocon/Orchid</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>
