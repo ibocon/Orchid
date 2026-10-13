@@ -1,0 +1,44 @@
+@using Orchid.Contract.Model
+@using Orchid.Core.Domain.Entity
+
+<div class="clipboard-list-container">
+    <div class="search-bar">
+        <input type="text" placeholder="클립보드 검색..." @bind="SearchQuery" @bind:event="oninput" />
+    </div>
+
+    @if (Items == null || Items.Count == 0)
+    {
+        <div class="empty-state">
+            <p>클립보드 기록이 없습니다.</p>
+        </div>
+    }
+    else
+    {
+        <ul class="items-list">
+            @foreach (ClipboardItem item in FilteredItems)
+            {
+                <li class="item-card @(item.IsPinned ? "pinned" : "")">
+                    <div class="item-header">
+                        <span class="badge">@item.ContentType</span>
+                        <span class="timestamp">@item.CreatedAtUtc.ToLocalTime().ToString("HH:mm:ss")</span>
+                    </div>
+                    <div class="item-body">
+                        <p class="preview-text">E2EE 암호화됨 (@item.CipherText.Length bytes)</p>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<ClipboardItem> Items { get; set; } = [];
+
+    private string SearchQuery { get; set; } = string.Empty;
+
+    private IEnumerable<ClipboardItem> FilteredItems =>
+        string.IsNullOrWhiteSpace(SearchQuery)
+            ? Items
+            : Items.Where(i => i.ContentType.ToString().Contains(SearchQuery, StringComparison.OrdinalIgnoreCase));
+}

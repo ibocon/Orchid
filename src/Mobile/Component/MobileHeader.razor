@@ -1,0 +1,18 @@
+<header class="mobile-header">
+    <div class="brand">
+        <span class="logo">🌿</span>
+        <h1 class="title">Orchid</h1>
+    </div>
+    <div class="sync-status">
+        <span class="status-dot @(IsConnected ? "online" : "offline")"></span>
+        <span class="status-text">@(IsConnected ? "동기화 중" : "오프라인")</span>
+    </div>
+</header>
+
+@code {
+    /// <summary>
+    /// 백엔드 릴레이 서버와의 실시간 연결 상태를 나타냅니다.
+    /// </summary>
+    [Parameter]
+    public bool IsConnected { get; set; } = true;
+}

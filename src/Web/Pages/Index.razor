@@ -1,0 +1,35 @@
+@page "/"
+
+<PageTitle>Orchid - E2EE 웹 대시보드</PageTitle>
+
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>🌿 Orchid 클립보드 뷰어</h1>
+        <p>Zero-Knowledge E2EE 클립보드 동기화 대시보드</p>
+    </header>
+
+    <main class="dashboard-main">
+        <VirtualizedHistoryGrid Items="@sampleItems" />
+    </main>
+</div>
+
+@code {
+    private List<ClipboardItem> sampleItems = [];
+
+    protected override void OnInitialized()
+    {
+        sampleItems =
+        [
+            new ClipboardItem(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DevicePlatform.Web,
+                ContentType.Text,
+                [1, 2, 3, 4],
+                [5, 6, 7],
+                [8, 9],
+                "hash-1234",
+                DateTimeOffset.UtcNow)
+        ];
+    }
+}

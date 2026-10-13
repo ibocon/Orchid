@@ -1,0 +1,39 @@
+@namespace Orchid.Mobile.Component
+@using Orchid.Contract.Model
+
+<div class="swipeable-item-container">
+    <div class="item-content">
+        <span class="badge">@ContentType</span>
+        <p class="preview-text">@PreviewText</p>
+    </div>
+    <div class="item-actions">
+        <button class="action-btn pin-btn" @onclick="OnPinClick">📌</button>
+        <button class="action-btn delete-btn" @onclick="OnDeleteClick">🗑️</button>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 클립보드 데이터의 콘텐츠 형식
+    /// </summary>
+    [Parameter]
+    public ContentType ContentType { get; set; } = ContentType.Text;
+
+    /// <summary>
+    /// 표시할 미리보기 텍스트
+    /// </summary>
+    [Parameter]
+    public string PreviewText { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 고정 이벤트 콜백
+    /// </summary>
+    [Parameter]
+    public EventCallback OnPinClick { get; set; }
+
+    /// <summary>
+    /// 삭제 이벤트 콜백
+    /// </summary>
+    [Parameter]
+    public EventCallback OnDeleteClick { get; set; }
+}

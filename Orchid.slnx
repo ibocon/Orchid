@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/Orchid.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/Desktop/">
+    <Project Path="src/Desktop/Orchid.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/src/Mobile/">
+    <Project Path="src/Mobile/Orchid.Mobile.csproj" />
+  </Folder>
+  <Folder Name="/src/Service/" />
+  <Folder Name="/src/Service/ApiGateway/">
+    <Project Path="src/Service/ApiGateway/Orchid.ApiGateway.csproj" />
+  </Folder>
+  <Folder Name="/src/Service/Clipboard/">
+    <Project Path="src/Service/Clipboard/Orchid.Service.Clipboard.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/" />
+  <Folder Name="/src/Shared/Contract/">
+    <Project Path="src/Shared/Contract/Orchid.Contract.csproj" />
+  </Folder>
+  <Folder Name="/src/Web/">
+    <Project Path="src/Web/Orchid.Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Orchid.UnitTests/Orchid.UnitTests.csproj" />
+  </Folder>
+</Solution>

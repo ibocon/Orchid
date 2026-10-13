@@ -1,0 +1,116 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git check-attr *)",
+      "Bash(powershell -NoProfile -Command \"Get-Item Directory.Build.props | Format-List\")",
+      "Bash(git diff *)",
+      "Bash(python -c ' *)",
+      "PowerShell(pwsh -NoProfile -ExecutionPolicy Bypass -File lib/Garden/harness/scripts/Test-PlanningGuard.ps1 -PlanPath docs/planning/260423_feat_free-ledger-owner-limit.md)",
+      "Bash(git -C lib/Garden status)",
+      "Bash(git -C lib/Garden diff harness/docs/AGENT_CONTEXT.md)",
+      "Bash(git -C lib/Garden log --oneline -20)",
+      "Bash(git -C lib/Garden branch --show-current)",
+      "Bash(pwsh -NoProfile -ExecutionPolicy Bypass -File lib/Garden/harness/scripts/Test-PlanningGuard.ps1 -PlanPath docs/planning/260424_fix_guard-single-ca1720.md)",
+      "Bash(git -C lib/Garden show HEAD:harness/docs/AGENT_CONTEXT.md)",
+      "Bash(git -C lib/Garden reflog --date=iso)",
+      "Bash(git -C lib/Garden stash push -m \"pre-ledger-ui-commit: stale AGENT_CONTEXT.md doc link removal\" -- harness/docs/AGENT_CONTEXT.md)",
+      "Bash(git -C lib/Garden status --porcelain --untracked-files=no)",
+      "Bash(pwsh -NoProfile -ExecutionPolicy Bypass -File lib/Garden/harness/scripts/Test-HarnessSharedStateGuard.ps1)",
+      "Bash(git commit -m ' *)",
+      "Bash(git -C lib/Garden stash pop)",
+      "Bash(git -C lib/Garden stash drop)",
+      "Bash(git -C lib/Garden log origin/main..HEAD --oneline)",
+      "Bash(git -C lib/Garden diff --stat)",
+      "Bash(git -C lib/Garden diff docs/convention/naming.md)",
+      "PowerShell(pwsh -NoProfile -ExecutionPolicy Bypass -File lib/Garden/harness/scripts/Invoke-FastPreCommit.ps1)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__playwright__browser_take_screenshot",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/dotnet/guards/Test-PlaywrightArtifactPath.ps1",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/plan/scripts/Invoke-PlanSessionSnapshotOnBash.ps1",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/dotnet/guards/Test-RawDotnetBuildGuard.ps1",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/dotnet/scripts/Invoke-SolutionBuildOnWrite.ps1",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/mermaid/guards/Invoke-MermaidGuardOnWrite.ps1 2>&1 | tail -20",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/plan/scripts/Invoke-PlanningGuardOnWrite.ps1",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/plan/scripts/Invoke-PlanArchiveOnBash.ps1",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/plan/scripts/Invoke-SessionPlanArchiveSweep.ps1",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/agents/guards/Test-UserCommandHandoffGuard.ps1",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
