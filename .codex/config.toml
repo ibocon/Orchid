@@ -1,0 +1,155 @@
+model_verbosity = "low"
+model_reasoning_summary = "concise"
+[agents]
+max_threads = 4
+max_depth = 1
+interrupt_message = true
+
+[mcp_servers.aspire]
+command = "node"
+cwd = ".."
+args = [
+    "lib/Garden.Harness/src/agents/mcp/mcp-stdio-supervisor.mjs",
+    "--lazy",
+    "aspire",
+    "--",
+    "aspire",
+    "agent",
+    "mcp",
+]
+
+[mcp_servers.docker]
+command = "docker"
+args = [
+    "mcp",
+    "gateway",
+    "run",
+]
+
+[mcp_servers.kubernetes]
+command = "node"
+cwd = ".."
+args = [
+    "lib/Garden.Harness/src/agents/mcp/mcp-stdio-supervisor.mjs",
+    "--lazy",
+    "kubernetes",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "lib/Garden.Harness/src/agents/mcp/Invoke-KubernetesMcpServer.ps1",
+]
+startup_timeout_sec = 120
+
+[mcp_servers.kubernetes.env]
+KUBECONFIG = "${env:KUBECONFIG}"
+ALLOW_ONLY_NON_DESTRUCTIVE_TOOLS = "true"
+
+[mcp_servers.grafana]
+command = "node"
+cwd = ".."
+args = [
+    "lib/Garden.Harness/src/agents/mcp/mcp-stdio-supervisor.mjs",
+    "--lazy",
+    "grafana",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "lib/Garden.Harness/src/agents/mcp/Invoke-GrafanaMcpServer.ps1",
+]
+startup_timeout_sec = 300
+
+[mcp_servers.prometheus]
+command = "node"
+cwd = ".."
+args = [
+    "lib/Garden.Harness/src/agents/mcp/mcp-stdio-supervisor.mjs",
+    "--lazy",
+    "prometheus",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "lib/Garden.Harness/src/agents/mcp/Invoke-PrometheusMcpServer.ps1",
+]
+startup_timeout_sec = 300
+
+[mcp_servers.prometheus.env]
+KUBECONFIG = "${env:KUBECONFIG}"
+
+[mcp_servers.playwright]
+command = "node"
+cwd = ".."
+args = [
+    "lib/Garden.Harness/src/agents/mcp/mcp-stdio-supervisor.mjs",
+    "--lazy",
+    "playwright",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "lib/Garden.Harness/src/agents/mcp/Invoke-PlaywrightMcpServer.ps1",
+    "-Channel",
+    "edge-debug",
+]
+
+[mcp_servers.playwright-webview2]
+command = "node"
+cwd = ".."
+args = [
+    "lib/Garden.Harness/src/agents/mcp/mcp-stdio-supervisor.mjs",
+    "--lazy",
+    "playwright-webview2",
+    "--",
+    "pwsh",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "lib/Garden.Harness/src/agents/mcp/Invoke-PlaywrightMcpServer.ps1",
+    "-Channel",
+    "webview2",
+]
+
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+
+[mcp_servers.sentry]
+url = "https://mcp.sentry.dev/mcp/botanicsoft"
+
+[mcp_servers.posthog]
+url = "https://mcp.posthog.com/mcp"
+
+[mcp_servers.amplitude]
+url = "https://mcp.amplitude.com/mcp"
+
+[mcp_servers.notion]
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp/oauth"
+
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+bearer_token_env_var = "GITHUB_PERSONAL_ACCESS_TOKEN"
+
+[mcp_servers.microsoft-learn]
+url = "https://learn.microsoft.com/api/mcp"
+
+[mcp_servers.penpot]
+url = "https://design.penpot.app/mcp/stream?userToken=eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2R0NNIn0.0Wz4nip7jtU9WzYBRsdqdQut1e4nzG7xzNvuLcZTGis0S40scRQ-gg._euOVkSx2ut4yBVV.PzSTUfl2absRIf3ZgmATJHlUCv6ocVANlHpVsSBj6IXtwSm2CSgaGy_m2vpYBSVnIbgzD4fj0laXkh877frty0pkLNvFxT0qDAQerhLgTthLIJUvMqyp3nDEypA9HP6V6jSau7JSMgh6i7mI_2sNusabcOY-tQEhcdw40pjUigpyvs3vepV54D_Bi8vKClGOJf9M7BqKhekc.AzxgnqC_B8YFEQ0FgV6SFA"
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+GIT_OPTIONAL_LOCKS = "0"

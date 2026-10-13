@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# pre-commit hook — invokes the PowerShell validation scripts.
+# Requires: git config core.hooksPath .githooks
+
+set -e
+
+pwsh -NoProfile -ExecutionPolicy Bypass -File lib/Garden.Harness/src/plan/scripts/Test-CompletedPlanSyncRequired.ps1 -ManifestPath harness-manifest.orchid.json
+pwsh -NoProfile -ExecutionPolicy Bypass -File lib/Garden.Harness/src/mermaid/guards/Test-MermaidGuard.ps1 -ManifestPath harness-manifest.orchid.json
+pwsh -NoProfile -ExecutionPolicy Bypass -File lib/Garden.Harness/src/git/scripts/Test-SharedGitignoreGuard.ps1 -ManifestPath harness-manifest.orchid.json
+
+exit 0

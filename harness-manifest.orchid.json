@@ -1,0 +1,93 @@
+{
+  "$schemaRef": "lib/Garden.Harness/src/manifest/harness-manifest.schema.json",
+  "harnessRoot": "lib/Garden.Harness/src",
+  "guardSets": ["core", "dotnet"],
+  "sourceLayout": {
+    "docsDir": "lib/Garden.Harness/src/docs",
+    "hooksDir": "lib/Garden.Harness/src/hooks",
+    "frameworkRoots": [
+      "lib/Garden.Harness/src/dotnet",
+      "lib/Garden.Harness/src/kubernetes"
+    ],
+    "mcpDir": "lib/Garden.Harness/src/mcp"
+  },
+  "context": {
+    "profile": "Slim",
+    "principlesPath": "lib/Garden.Harness/src/PRINCIPLES.md",
+    "contextPath": "lib/Garden.Harness/src/agents/AGENT_CONTEXT.md",
+    "conventionDir": [
+      "lib/Garden.Harness/src/convention/core"
+    ],
+    "referenceCorpus": {
+      "principles": "lib/Garden.Harness/src/PRINCIPLES.md",
+      "conventionDir": [
+        "lib/Garden.Harness/src/convention/core"
+      ],
+      "guideDir": [
+        "lib/Garden.Harness/src/guide/core"
+      ],
+      "bookNotesDir": "lib/Garden.Harness/src/docs/book-notes",
+      "referenceDir": "lib/Garden.Harness/src/docs/reference",
+      "troubleshootingDir": "lib/Garden.Harness/src/docs/troubleshooting"
+    },
+    "workflowGuidePath": "lib/Garden.Harness/src/guide/core/harness-workflow.md",
+    "contractGuidePath": "lib/Garden.Harness/src/guide/core/subagent-contract.md"
+  },
+  "boundary": {
+    "sourceRoot": "lib/Garden.Harness/src",
+    "allowedAdapterPaths": [
+      "AGENTS.md",
+      ".claude/agents/",
+      ".codex/agents/",
+      ".agents/skills/",
+      ".githooks/pre-commit",
+      "lib/Garden.Harness/.agents/",
+      "lib/Garden.Harness/test/",
+      "lib/Garden.Harness/src/agents/AGENT_CONTEXT.md",
+      "lib/Garden.Harness/src/guide/core/harness-workflow.md",
+      "lib/Garden.Harness/src/guide/core/harness-engineering.md",
+      "lib/Garden.Harness/src/guide/core/subagent-contract.md"
+    ]
+  },
+  "budget": {
+    "agentContext": { "maxLines": 24, "maxWords": 90 },
+    "hostAdapter": { "maxHarnessLines": 6, "maxDuplicateContextMentions": 1 }
+  },
+  "workflow": {
+    "routerSkill": "orchestrate-workflows",
+    "debugSkill": "debug-failures",
+    "verificationSkill": "verify-completion",
+    "planningSkill": "write-plan"
+  },
+  "protectedFiles": {
+    "editorConfig": {
+      "paths": [".editorconfig"],
+      "overrideEnv": "ALLOW_EDITORCONFIG_CHANGE",
+      "requiredPlanningPattern": "docs/planning/*editorconfig*.md"
+    },
+    "directoryBuildProps": {
+      "paths": ["Directory.Build.props"],
+      "overrideEnv": "ALLOW_DIRECTORY_BUILD_PROPS_CHANGE",
+      "requiredPlanningPattern": "docs/planning/*directory-build-props*.md"
+    }
+  },
+  "git": {
+    "trunkPolicy": {
+      "trunkBranch": "main",
+      "enforce": true
+    },
+    "sharedGitignore": {
+      "sourceOfTruth": "lib/Garden.Harness/src/git/gitignore/shared.gitignore",
+      "regionStart": "# #region GardenHarness/gitignore",
+      "regionEnd": "# #endregion GardenHarness/gitignore",
+      "targets": [
+        ".gitignore",
+        "lib/Garden.Harness/.gitignore"
+      ]
+    }
+  },
+  "hostAdapterMode": "MinimalIndex",
+  "hosts": [
+    { "path": "AGENTS.md", "managedHeader": "<!-- HARNESS:START -->", "managedFooter": "<!-- HARNESS:END -->" }
+  ]
+}
