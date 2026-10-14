@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: orchid-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/websocket-services: "orchid-api-gateway-service"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - orchid.prod.botanicsoft.com
+      secretName: orchid-prod-tls
+  rules:
+    - host: orchid.prod.botanicsoft.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: orchid-api-gateway-service
+                port:
+                  number: 8080

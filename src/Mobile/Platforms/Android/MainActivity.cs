@@ -1,7 +1,6 @@
 #if ANDROID
 using Android.App;
 using Android.Content.PM;
-using Microsoft.Maui;
 
 namespace Orchid.Mobile.Platforms.Android;
 

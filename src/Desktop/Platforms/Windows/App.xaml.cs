@@ -1,6 +1,3 @@
-using Microsoft.Maui;
-using Microsoft.Maui.Hosting;
-
 namespace Orchid.Desktop.WinUI;
 
 /// <summary>
@@ -17,5 +14,8 @@ public partial class App : MauiWinUIApplication
     }
 
     /// <inheritdoc />
-    protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+    protected override MauiApp CreateMauiApp()
+    {
+        return MauiProgram.CreateMauiApp();
+    }
 }

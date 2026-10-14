@@ -2,16 +2,19 @@
 
 <PageTitle>Orchid - E2EE 웹 대시보드</PageTitle>
 
-<div class="dashboard-container">
-    <header class="dashboard-header">
-        <h1>🌿 Orchid 클립보드 뷰어</h1>
-        <p>Zero-Knowledge E2EE 클립보드 동기화 대시보드</p>
-    </header>
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudPaper Elevation="1" Class="pa-6 mb-4">
+        <div class="d-flex align-center gap-3">
+            <MudIcon Icon="@Icons.Material.Filled.Spa" Size="MudSize.Large" Color="Color.Success" />
+            <div>
+                <MudText Typo="Typo.h5">Orchid 클립보드 뷰어</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Zero-Knowledge E2EE 클립보드 동기화 대시보드</MudText>
+            </div>
+        </div>
+    </MudPaper>
 
-    <main class="dashboard-main">
-        <VirtualizedHistoryGrid Items="@sampleItems" />
-    </main>
-</div>
+    <VirtualizedHistoryGrid Items="@sampleItems" />
+</MudContainer>
 
 @code {
     private List<ClipboardItem> sampleItems = [];

@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orchid-api-gateway-config-map
+  labels:
+    app.kubernetes.io/name: orchid-api-gateway
+    app.kubernetes.io/part-of: orchid
+data:
+  appsettings.json: |
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft.AspNetCore": "Warning",
+          "Yarp": "Information"
+        }
+      },
+      "AllowedHosts": "*",
+      "ReverseProxy": {
+        "Routes": {
+          "clipboard-route": {
+            "ClusterId": "clipboard-cluster",
+            "Match": {
+              "Path": "/api/clipboard/{**catch-all}"
+            }
+          },
+          "realtime-hub-route": {
+            "ClusterId": "clipboard-cluster",
+            "Match": {
+              "Path": "/hubs/clipboard/{**catch-all}"
+            }
+          }
+        },
+        "Clusters": {
+          "clipboard-cluster": {
+            "Destinations": {
+              "destination1": {
+                "Address": "http://orchid-clipboard-service:8080"
+              }
+            }
+          }
+        }
+      }
+    }

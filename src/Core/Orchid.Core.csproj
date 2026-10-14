@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Orchid.Core</RootNamespace>
     <AssemblyName>Orchid.Core</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DefaultItemExcludes>$(DefaultItemExcludes);test\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

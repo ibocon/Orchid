@@ -1,8 +1,6 @@
 #if ANDROID
 using Android.App;
 using Android.Runtime;
-using Microsoft.Maui;
-using Microsoft.Maui.Hosting;
 
 namespace Orchid.Mobile.Platforms.Android;
 
@@ -21,6 +19,9 @@ public class MainApplication : MauiApplication
     }
 
     /// <inheritdoc />
-    protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+    protected override MauiApp CreateMauiApp()
+    {
+        return MauiProgram.CreateMauiApp();
+    }
 }
 #endif

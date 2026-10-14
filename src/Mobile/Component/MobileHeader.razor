@@ -1,13 +1,16 @@
-<header class="mobile-header">
-    <div class="brand">
-        <span class="logo">🌿</span>
-        <h1 class="title">Orchid</h1>
-    </div>
-    <div class="sync-status">
-        <span class="status-dot @(IsConnected ? "online" : "offline")"></span>
-        <span class="status-text">@(IsConnected ? "동기화 중" : "오프라인")</span>
-    </div>
-</header>
+@namespace Orchid.Mobile.Component
+
+<MudAppBar Elevation="2" Dense="true" Color="Color.Surface">
+    <MudIcon Icon="@Icons.Material.Filled.Spa" Color="Color.Success" Class="mr-2" />
+    <MudText Typo="Typo.h6" Class="flex-grow-1">Orchid</MudText>
+    <MudChip T="string"
+             Color="@(IsConnected ? Color.Success : Color.Error)"
+             Size="MudSize.Small"
+             Variant="Variant.Outlined"
+             Icon="@(IsConnected ? Icons.Material.Filled.Sync : Icons.Material.Filled.SyncDisabled)">
+        @(IsConnected ? "동기화 중" : "오프라인")
+    </MudChip>
+</MudAppBar>
 
 @code {
     /// <summary>

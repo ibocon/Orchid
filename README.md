@@ -1,10 +1,10 @@
 # 🌿 Orchid
 
 > **Universal E2EE Clipboard Synchronization & History Ecosystem**  
-> Cross-platform clipboard sharing across **Windows, macOS, Android, and iOS** built with **.NET 9, .NET MAUI, and Clean Architecture**.
+> Cross-platform clipboard sharing across **Windows, macOS, Android, and iOS** built with **.NET 10, .NET MAUI, and Clean Architecture**.
 
-[![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![C# 13](https://img.shields.io/badge/C%23-13.0-239120?style=flat-square&logo=csharp&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/csharp/)
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![C# 14](https://img.shields.io/badge/C%23-14.0-239120?style=flat-square&logo=csharp&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/csharp/)
 [![MAUI](https://img.shields.io/badge/.NET_MAUI-Cross--Platform-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/apps/maui)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg?style=flat-square)](LICENSE)
 
@@ -63,7 +63,7 @@ Orchid/
 │   ├── architecture/            # 시스템 아키텍처 및 E2EE 암호화 프로토콜 명세
 │   └── planning/                # 기능 및 설계 계획서
 ├── src/
-│   ├── Core/                    # 4대 OS 공용 비즈니스 코어 (순수 C# .NET 9)
+│   ├── Core/                    # 4대 OS 공용 비즈니스 코어 (순수 C# .NET 10)
 │   ├── Desktop/                 # .NET MAUI Blazor Hybrid (Windows / macOS)
 │   ├── Mobile/                  # .NET MAUI Blazor Hybrid (Android / iOS)
 │   ├── Web/                     # Blazor WebAssembly 클립보드 뷰어 대시보드
@@ -72,7 +72,7 @@ Orchid/
 │   │   └── Clipboard/           # Clean Architecture E2EE 암호화 릴레이 백엔드
 │   └── Shared/
 │       └── Contract/            # 공통 DTO 및 E2EE 통신 페이로드 정의
-├── Directory.Build.props        # 공통 컴파일러, C# 13, 널러블 설정
+├── Directory.Build.props        # 공통 컴파일러, C# 14, 널러블 설정
 ├── Directory.Packages.props     # 중앙 집중식 NuGet 패키지 버전 관리 (CPVM)
 ├── .editorconfig
 └── README.md
@@ -84,7 +84,7 @@ Orchid/
 
 | 영역 | 기술 스택 |
 | :--- | :--- |
-| **Language & Framework** | C# 13, .NET 9, .NET MAUI, Blazor Hybrid |
+| **Language & Framework** | C# 14, .NET 10, .NET MAUI, Blazor Hybrid |
 | **Desktop & Mobile** | Win32 API, AppKit / Cocoa, Android AccessibilityService, iOS Share Extension |
 | **Cryptography** | AES-256-GCM, ECDH (Elliptic-curve Diffie-Hellman), Libsodium |
 | **Local Storage** | SQLite-net (암호화 로컬 히스토리 캐시) |

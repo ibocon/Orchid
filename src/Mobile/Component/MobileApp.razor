@@ -1,0 +1,18 @@
+@namespace Orchid.Mobile.Component
+
+<OrchidMobileDesignSystemProvider @ref="_provider" />
+<MudThemeProvider Theme="_provider?.CurrentMudTheme" IsDarkMode="true" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+
+<MudLayout>
+    <MobileHeader />
+    <MudMainContent Class="pa-3">
+        <QrPairingScanner />
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private OrchidMobileDesignSystemProvider? _provider;
+}

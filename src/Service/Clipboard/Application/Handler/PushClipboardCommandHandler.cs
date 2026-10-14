@@ -1,7 +1,6 @@
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 using Orchid.Service.Clipboard.Application.Command;
-using Orchid.Service.Clipboard.Infrastructure.Realtime;
+using Orchid.Service.Clipboard.Application.Common;
 
 namespace Orchid.Service.Clipboard.Application.Handler;
 
@@ -10,15 +9,15 @@ namespace Orchid.Service.Clipboard.Application.Handler;
 /// </summary>
 public sealed class PushClipboardCommandHandler : IRequestHandler<PushClipboardCommand, bool>
 {
-    private readonly IHubContext<ClipboardHub> _hubContext;
+    private readonly IRealtimeBroadcastService _broadcastService;
 
     /// <summary>
     /// <see cref="PushClipboardCommandHandler"/> 클래스의 새 인스턴스를 초기화합니다.
     /// </summary>
-    /// <param name="hubContext">SignalR 클립보드 허브 컨텍스트</param>
-    public PushClipboardCommandHandler(IHubContext<ClipboardHub> hubContext)
+    /// <param name="broadcastService">실시간 브로드캐스트 추상화 서비스</param>
+    public PushClipboardCommandHandler(IRealtimeBroadcastService broadcastService)
     {
-        _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
+        _broadcastService = broadcastService ?? throw new ArgumentNullException(nameof(broadcastService));
     }
 
     /// <inheritdoc />
@@ -27,7 +26,7 @@ public sealed class PushClipboardCommandHandler : IRequestHandler<PushClipboardC
         ArgumentNullException.ThrowIfNull(request);
 
         // 다른 디바이스들로 실시간 E2EE 암호화 페이로드 브로드캐스트
-        await _hubContext.Clients.All.SendAsync("OnClipboardReceived", request.Payload, cancellationToken).ConfigureAwait(false);
+        await _broadcastService.BroadcastAsync(request.Payload, cancellationToken).ConfigureAwait(false);
         return true;
     }
 }

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchid-api-gateway
+  labels:
+    app.kubernetes.io/name: orchid-api-gateway
+    app.kubernetes.io/part-of: orchid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: orchid-api-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: orchid-api-gateway
+        app.kubernetes.io/part-of: orchid
+    spec:
+      containers:
+        - name: api-gateway
+          image: harbor.hanul.botanicsoft.com/orchid/api-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+          envFrom:
+            - configMapRef:
+                name: orchid-api-gateway-config-map
+            - secretRef:
+                name: orchid-api-gateway-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

@@ -78,7 +78,7 @@ public class Result
 /// </summary>
 /// <typeparam name="T">결과 값의 형식</typeparam>
 [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Functional Result pattern")]
-public class Result<T> : Result
+public sealed class Result<T> : Result
 {
     private readonly T? _value;
 
@@ -88,7 +88,7 @@ public class Result<T> : Result
     /// <param name="value">결과 값</param>
     /// <param name="isSuccess">성공 여부</param>
     /// <param name="error">오류 객체</param>
-    protected Result(T? value, bool isSuccess, Error? error)
+    private Result(T? value, bool isSuccess, Error? error)
         : base(isSuccess, error)
     {
         _value = value;

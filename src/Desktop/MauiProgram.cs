@@ -1,4 +1,5 @@
-using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
+using Garden.Razor;
 using Orchid.Core.Abstraction;
 using Orchid.Core.Cryptography;
 using Orchid.Core.Storage;
@@ -23,6 +24,9 @@ public static class MauiProgram
             .UseMauiApp<App>();
 
         builder.Services.AddMauiBlazorWebView();
+        builder.Services.AddMudServices();
+        builder.Services.AddGardenRazor();
+        builder.Services.AddDesignSystem();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

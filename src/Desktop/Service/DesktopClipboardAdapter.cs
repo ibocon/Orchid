@@ -12,7 +12,7 @@ public sealed class DesktopClipboardAdapter : ISystemClipboard
     {
         if (Microsoft.Maui.ApplicationModel.DataTransfer.Clipboard.Default.HasText)
         {
-            return await Microsoft.Maui.ApplicationModel.DataTransfer.Clipboard.Default.GetTextAsync();
+            return await Microsoft.Maui.ApplicationModel.DataTransfer.Clipboard.Default.GetTextAsync().ConfigureAwait(false);
         }
 
         return null;
@@ -22,6 +22,6 @@ public sealed class DesktopClipboardAdapter : ISystemClipboard
     public async Task SetTextAsync(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        await Microsoft.Maui.ApplicationModel.DataTransfer.Clipboard.Default.SetTextAsync(text);
+        await Microsoft.Maui.ApplicationModel.DataTransfer.Clipboard.Default.SetTextAsync(text).ConfigureAwait(false);
     }
 }

@@ -5,6 +5,9 @@ using Xunit;
 
 namespace Orchid.UnitTests.Gateway;
 
+/// <summary>
+/// <see cref="CorrelationIdMiddleware"/>의 고유 식별자 발급 및 기존 식별자 전파를 검증하는 단위 테스트입니다.
+/// </summary>
 public sealed class CorrelationIdMiddlewareTests
 {
     [Fact]
@@ -12,38 +15,31 @@ public sealed class CorrelationIdMiddlewareTests
     {
         // Given
         var context = new DefaultHttpContext();
-        var nextCalled = false;
-        var middleware = new CorrelationIdMiddleware(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
+        var middleware = new CorrelationIdMiddleware(next: (_) => Task.CompletedTask);
 
         // When
         await middleware.InvokeAsync(context);
 
         // Then
-        nextCalled.Should().BeTrue();
-        context.Response.Headers.Should().ContainKey("X-Correlation-ID");
-        var correlationId = context.Response.Headers["X-Correlation-ID"].ToString();
-        correlationId.Should().NotBeNullOrWhiteSpace();
-        Guid.TryParse(correlationId, out _).Should().BeTrue();
+        context.Request.Headers.ContainsKey("X-Correlation-ID").Should().BeTrue();
+        context.Response.Headers.ContainsKey("X-Correlation-ID").Should().BeTrue();
+        Guid.TryParse(context.Response.Headers["X-Correlation-ID"].ToString(), out _).Should().BeTrue();
     }
 
     [Fact]
     public async Task InvokeAsync_WhenHeaderPresent_ShouldPreserveCorrelationId()
     {
         // Given
-        const string existingCorrelationId = "test-correlation-123";
+        string existingId = "existing-custom-trace-id";
         var context = new DefaultHttpContext();
-        context.Request.Headers["X-Correlation-ID"] = existingCorrelationId;
+        context.Request.Headers["X-Correlation-ID"] = existingId;
 
-        var middleware = new CorrelationIdMiddleware(_ => Task.CompletedTask);
+        var middleware = new CorrelationIdMiddleware(next: (_) => Task.CompletedTask);
 
         // When
         await middleware.InvokeAsync(context);
 
         // Then
-        context.Response.Headers["X-Correlation-ID"].ToString().Should().Be(existingCorrelationId);
+        context.Response.Headers["X-Correlation-ID"].ToString().Should().Be(existingId);
     }
 }

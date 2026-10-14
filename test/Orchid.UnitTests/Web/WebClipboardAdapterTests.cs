@@ -1,12 +1,14 @@
 using FluentAssertions;
 using Microsoft.JSInterop;
-using Microsoft.JSInterop.Infrastructure;
 using Moq;
 using Orchid.Web.Service;
 using Xunit;
 
 namespace Orchid.UnitTests.Web;
 
+/// <summary>
+/// <see cref="WebClipboardAdapter"/>의 JavaScript interop 호출 및 브라우저 예외 격리를 검증하는 단위 테스트입니다.
+/// </summary>
 public sealed class WebClipboardAdapterTests
 {
     [Fact]
@@ -14,10 +16,10 @@ public sealed class WebClipboardAdapterTests
     {
         // Given
         var jsMock = new Mock<IJSRuntime>();
-        jsMock.Setup(x => x.InvokeAsync<string?>(
-                "navigator.clipboard.readText",
-                It.IsAny<object[]>()))
-            .ThrowsAsync(new JSException("Permission denied"));
+        jsMock.Setup(js => js.InvokeAsync<string?>(
+            "navigator.clipboard.readText",
+            It.IsAny<object?[]>()))
+            .ThrowsAsync(new JSException("Clipboard permission denied"));
 
         var adapter = new WebClipboardAdapter(jsMock.Object);
 
@@ -33,10 +35,10 @@ public sealed class WebClipboardAdapterTests
     {
         // Given
         var jsMock = new Mock<IJSRuntime>();
-        jsMock.Setup(x => x.InvokeAsync<string?>(
-                "navigator.clipboard.readText",
-                It.IsAny<object[]>()))
-            .ReturnsAsync("Copied Content");
+        jsMock.Setup(js => js.InvokeAsync<string?>(
+            "navigator.clipboard.readText",
+            It.IsAny<object?[]>()))
+            .ReturnsAsync("Hello Web");
 
         var adapter = new WebClipboardAdapter(jsMock.Object);
 
@@ -44,7 +46,7 @@ public sealed class WebClipboardAdapterTests
         var result = await adapter.GetTextAsync();
 
         // Then
-        result.Should().Be("Copied Content");
+        result.Should().Be("Hello Web");
     }
 
     [Fact]
@@ -55,7 +57,7 @@ public sealed class WebClipboardAdapterTests
         var adapter = new WebClipboardAdapter(jsMock.Object);
 
         // When & Then
-        var act = async () => await adapter.SetTextAsync(null!);
+        Func<Task> act = async () => await adapter.SetTextAsync(null!);
         await act.Should().ThrowAsync<ArgumentNullException>();
     }
 }

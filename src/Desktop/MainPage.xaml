@@ -8,7 +8,7 @@
 
     <b:BlazorWebView HostPage="wwwroot/index.html">
         <b:BlazorWebView.RootComponents>
-            <b:RootComponent Selector="#app" ComponentType="{x:Type local:ClipboardList}" />
+            <b:RootComponent Selector="#app" ComponentType="{x:Type local:DesktopApp}" />
         </b:BlazorWebView.RootComponents>
     </b:BlazorWebView>
 

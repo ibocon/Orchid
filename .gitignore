@@ -505,6 +505,7 @@ nunit-*.xml
 
 # 26.02.26 [예건] Opencode
 .sisyphus/
+.omo/
 
 # 26.02.28 [예건] js 디버깅 파일 제거
 *.js.map

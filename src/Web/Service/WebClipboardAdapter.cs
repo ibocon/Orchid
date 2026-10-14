@@ -14,7 +14,10 @@ public sealed class WebClipboardAdapter : ISystemClipboard
     /// <see cref="WebClipboardAdapter"/> 클래스의 새 인스턴스를 초기화합니다.
     /// </summary>
     /// <param name="js">JavaScript 런타임 인스턴스</param>
-    public WebClipboardAdapter(IJSRuntime js) => _js = js ?? throw new ArgumentNullException(nameof(js));
+    public WebClipboardAdapter(IJSRuntime js)
+    {
+        _js = js ?? throw new ArgumentNullException(nameof(js));
+    }
 
     /// <inheritdoc />
     public async Task<string?> GetTextAsync()

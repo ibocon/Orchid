@@ -1,10 +1,15 @@
 @namespace Orchid.Mobile.Component
 
-<div class="qr-scanner-card">
-    <div class="scanner-viewfinder">
-        <p class="guide-text">데스크톱 화면에 표시된 페어링 QR 코드를 스캔하세요.</p>
-    </div>
-</div>
+<MudPaper Elevation="2" Class="pa-6 d-flex flex-column align-center justify-center gap-4 text-center">
+    <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner" Size="MudSize.Large" Color="Color.Primary" />
+    <MudText Typo="Typo.subtitle1">디바이스 페어링</MudText>
+    <MudText Typo="Typo.body2" Color="Color.Secondary">
+        데스크톱 화면에 표시된 페어링 QR 코드를 스캔하세요.
+    </MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CameraAlt">
+        카메라 스캔 시작
+    </MudButton>
+</MudPaper>
 
 @code {
     /// <summary>

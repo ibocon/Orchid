@@ -7,7 +7,7 @@
 ## 1. 프로젝트 역할 및 책임
 - **역할**: Windows와 macOS 데스크톱 사용자를 위한 백그라운드 클립보드 상시 감시 및 시스템 트레이 상주 앱.
 - **특징**:
-  - `Monolith/src/Oxygen/Desktop`의 실무 구조를 계승하여 Windows(`net9.0-windows10.0.19041`)와 Mac Catalyst(`net10.0-maccatalyst`)를 단일 프로젝트(`SingleProject=true`)로 타깃팅.
+  - `Monolith/src/Oxygen/Desktop`의 실무 구조를 계승하여 Windows(`net10.0-windows10.0.19041`)와 Mac Catalyst(`net10.0-maccatalyst`)를 단일 프로젝트(`SingleProject=true`)로 타깃팅.
   - UI는 고성능 Razor 컴포넌트(Blazor Hybrid)로 렌더링하고, 백그라운드 클립보드 이벤트는 OS 네이티브 훅으로 수신.
 
 ---

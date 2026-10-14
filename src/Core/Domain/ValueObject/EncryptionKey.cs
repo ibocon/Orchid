@@ -20,13 +20,7 @@ public sealed class EncryptionKey
     /// 키 바이트 배열의 읽기 전용 복사본을 반환합니다.
     /// </summary>
     [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Cryptographic key bytes clone")]
-    public byte[] KeyBytes
-    {
-        get
-        {
-            return (byte[])_keyBytes.Clone();
-        }
-    }
+    public byte[] KeyBytes => (byte[])_keyBytes.Clone();
 
     /// <summary>
     /// 바이트 배열로부터 256비트(32바이트) 암호화 키를 생성합니다.

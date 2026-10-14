@@ -1,10 +1,9 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.SignalR;
 using Moq;
 using Orchid.Contract.Payload;
 using Orchid.Service.Clipboard.Application.Command;
+using Orchid.Service.Clipboard.Application.Common;
 using Orchid.Service.Clipboard.Application.Handler;
-using Orchid.Service.Clipboard.Infrastructure.Realtime;
 using Xunit;
 
 namespace Orchid.UnitTests.Service;
@@ -15,14 +14,8 @@ public sealed class PushClipboardCommandHandlerTests
     public async Task Handle_Should_Broadcast_EncryptedPayload_To_Connected_Clients()
     {
         // Given
-        var hubMock = new Mock<IHubContext<ClipboardHub>>();
-        var clientsMock = new Mock<IHubClients>();
-        var clientProxyMock = new Mock<IClientProxy>();
-
-        hubMock.Setup(h => h.Clients).Returns(clientsMock.Object);
-        clientsMock.Setup(c => c.All).Returns(clientProxyMock.Object);
-
-        var handler = new PushClipboardCommandHandler(hubMock.Object);
+        var broadcastMock = new Mock<IRealtimeBroadcastService>();
+        var handler = new PushClipboardCommandHandler(broadcastMock.Object);
         var payload = new EncryptedPayload(Guid.NewGuid(), [1, 2], [3], [4], "AES-256-GCM", DateTimeOffset.UtcNow);
         var command = new PushClipboardCommand(Guid.NewGuid(), payload);
 
@@ -31,11 +24,8 @@ public sealed class PushClipboardCommandHandlerTests
 
         // Then
         result.Should().BeTrue();
-        clientProxyMock.Verify(
-            x => x.SendCoreAsync(
-                "OnClipboardReceived",
-                It.Is<object?[]>(args => args.Length == 1 && ReferenceEquals(args[0], payload)),
-                default),
+        broadcastMock.Verify(
+            x => x.BroadcastAsync(payload, It.IsAny<CancellationToken>()),
             Times.Once);
     }
 }

@@ -27,4 +27,26 @@ public sealed class EncryptedPayloadSerializationTests
         deserialized.Should().NotBeNull();
         deserialized.Should().BeEquivalentTo(original);
     }
+
+    [Fact]
+    public void EncryptedPayload_With_Empty_Bytes_Should_Preserve_Empty_Arrays()
+    {
+        // Given
+        var emptyPayload = new EncryptedPayload(
+            Guid.NewGuid(),
+            [],
+            [],
+            [],
+            "AES-256-GCM",
+            DateTimeOffset.UtcNow);
+
+        // When
+        var json = JsonSerializer.Serialize(emptyPayload);
+        var deserialized = JsonSerializer.Deserialize<EncryptedPayload>(json);
+
+        // Then
+        deserialized.Should().NotBeNull();
+        deserialized.Should().BeEquivalentTo(emptyPayload);
+        deserialized.CipherText.Should().BeEmpty();
+    }
 }

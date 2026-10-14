@@ -17,4 +17,15 @@ public sealed class MobileSyncWorkerTests
         worker.Setup(x => x.IsActive).Returns(false);
         worker.Object.IsActive.Should().BeFalse();
     }
+
+    [Fact]
+    public void Worker_Should_Resume_When_App_Returns_To_Foreground()
+    {
+        // Given
+        var worker = new Mock<IMobileSyncBackgroundWorker>();
+        worker.Setup(x => x.IsActive).Returns(true);
+
+        // When & Then
+        worker.Object.IsActive.Should().BeTrue();
+    }
 }

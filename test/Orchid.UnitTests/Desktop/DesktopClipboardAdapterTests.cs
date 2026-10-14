@@ -18,4 +18,18 @@ public sealed class DesktopClipboardAdapterTests
         var result = await mockClipboard.Object.GetTextAsync();
         result.Should().Be("Sample Text");
     }
+
+    [Fact]
+    public async Task Adapter_When_Clipboard_Is_Empty_Should_Return_Null()
+    {
+        // Given
+        var mockClipboard = new Mock<ISystemClipboard>();
+        mockClipboard.Setup(x => x.GetTextAsync()).ReturnsAsync((string?)null);
+
+        // When
+        var result = await mockClipboard.Object.GetTextAsync();
+
+        // Then
+        result.Should().BeNull();
+    }
 }

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- ✅ Peony 표준 어설션 및 테스트 러너 패키지 참조 -->
+    <PackageReference Include="FluentAssertions" Version="7.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- ✅ 솔루션 전역 DI 및 계약 검증을 위한 프로젝트 참조 수집 -->
+    <ProjectReference Include="..\..\src\Shared\Contract\Orchid.Contract.csproj" />
+    <ProjectReference Include="..\..\src\Core\Orchid.Core.csproj" />
+    <ProjectReference Include="..\..\src\Service\ApiGateway\Orchid.ApiGateway.csproj" />
+    <ProjectReference Include="..\..\src\Service\Clipboard\Orchid.Service.Clipboard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+</Project>

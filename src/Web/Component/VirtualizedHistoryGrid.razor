@@ -1,32 +1,37 @@
-<div class="virtualized-grid-container">
-    <div class="grid-header">
-        <span class="column-title">타입</span>
-        <span class="column-title">시간</span>
-        <span class="column-title">상태</span>
-    </div>
+@namespace Orchid.Web.Component
 
-    @if (Items == null || Items.Count == 0)
-    {
-        <div class="empty-state">
-            <p>표시할 클립보드 내역이 없습니다.</p>
-        </div>
-    }
-    else
-    {
-        <Virtualize TItem="ClipboardItem" Items="@Items" Context="item" ItemSize="50">
-            <ItemContent>
-                <div class="grid-row">
-                    <span class="badge">@item.ContentType</span>
-                    <span class="time">@item.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</span>
-                    <span class="crypto-status">E2EE 암호화됨 (@item.CipherText.Length bytes)</span>
-                </div>
-            </ItemContent>
-            <Placeholder>
-                <div class="grid-row placeholder">로딩 중...</div>
-            </Placeholder>
-        </Virtualize>
-    }
-</div>
+<MudTable Items="@Items"
+          Hover="true"
+          Breakpoint="Breakpoint.Sm"
+          Loading="@(Items == null)"
+          LoadingProgressColor="Color.Info"
+          Elevation="2">
+    <HeaderContent>
+        <MudTh>타입</MudTh>
+        <MudTh>시간</MudTh>
+        <MudTh>상태</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="타입">
+            <MudChip T="string" Color="Color.Primary" Size="MudSize.Small" Variant="Variant.Filled">
+                @context.ContentType.ToString()
+            </MudChip>
+        </MudTd>
+        <MudTd DataLabel="시간">
+            <MudText Typo="Typo.body2">
+                @context.CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
+            </MudText>
+        </MudTd>
+        <MudTd DataLabel="상태">
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                E2EE 암호화됨 (@context.CipherText.Length bytes)
+            </MudText>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Typo="Typo.body2" Class="pa-4 text-center">표시할 클립보드 내역이 없습니다.</MudText>
+    </NoRecordsContent>
+</MudTable>
 
 @code {
     /// <summary>

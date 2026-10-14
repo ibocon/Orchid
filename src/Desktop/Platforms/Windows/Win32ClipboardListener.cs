@@ -1,4 +1,5 @@
 #if WINDOWS
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Orchid.Desktop.Platforms.Windows;
@@ -29,6 +30,7 @@ public static partial class Win32ClipboardListener
     /// <summary>
     /// 클립보드 내용이 갱신되었을 때 발생하는 Windows 메시지 식별자입니다.
     /// </summary>
+    [SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Win32 message identifier")]
     public const int WM_CLIPBOARDUPDATE = 0x031D;
 }
 #endif

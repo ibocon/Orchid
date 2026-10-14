@@ -2,6 +2,7 @@
   <Folder Name="/src/" />
   <Folder Name="/src/Core/">
     <Project Path="src/Core/Orchid.Core.csproj" />
+    <Project Path="src/Core/test/ArchitectureTests/Orchid.Core.ArchTests.csproj" />
   </Folder>
   <Folder Name="/src/Desktop/">
     <Project Path="src/Desktop/Orchid.Desktop.csproj" />
@@ -15,6 +16,7 @@
   </Folder>
   <Folder Name="/src/Service/Clipboard/">
     <Project Path="src/Service/Clipboard/Orchid.Service.Clipboard.csproj" />
+    <Project Path="src/Service/Clipboard/test/ArchitectureTests/Orchid.Service.Clipboard.ArchTests.csproj" />
   </Folder>
   <Folder Name="/src/Shared/" />
   <Folder Name="/src/Shared/Contract/">
@@ -25,5 +27,6 @@
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/Orchid.UnitTests/Orchid.UnitTests.csproj" />
+    <Project Path="test/ArchitectureTests/Orchid.ArchTests.csproj" />
   </Folder>
 </Solution>

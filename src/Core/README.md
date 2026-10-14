@@ -41,6 +41,6 @@ src/Core/
 ├── Abstraction/                 # OS 네이티브 어댑터용 계약 인터페이스
 │   ├── ISystemClipboard.cs      # 네이티브 클립보드 I/O 추상화
 │   └── INativeNotification.cs   # 네이티브 알림 배너 추상화
-├── Orchid.Core.csproj           # 프로젝트 파일 (.NET 9)
+├── Orchid.Core.csproj           # 프로젝트 파일 (.NET 10)
 └── README.md                    # 본 설명 문서
 ```

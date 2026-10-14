@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Orchid.Contract.Payload;
 
 /// <summary>
@@ -7,6 +9,7 @@ namespace Orchid.Contract.Payload;
 /// <param name="PublicKey">디바이스 공개키 바이트 배열</param>
 /// <param name="KeyAlgorithm">키 교환 알고리즘 식별자 (예: ECDH-P256, X25519)</param>
 /// <param name="TimestampUtc">요청 생성 일시 (UTC)</param>
+[SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Cryptographic payload DTO requires byte arrays")]
 public sealed record KeyExchangePayload(
     Guid DeviceId,
     byte[] PublicKey,

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Orchid.Contract.Payload;
 
 /// <summary>
@@ -9,6 +11,7 @@ namespace Orchid.Contract.Payload;
 /// <param name="Tag">인증 태그(16바이트)</param>
 /// <param name="Algorithm">암호화 알고리즘 식별자 (예: AES-256-GCM)</param>
 /// <param name="CreatedAtUtc">생성 일시 (UTC)</param>
+[SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Cryptographic payload DTO requires byte arrays")]
 public sealed record EncryptedPayload(
     Guid Id,
     byte[] CipherText,

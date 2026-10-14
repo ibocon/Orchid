@@ -13,4 +13,4 @@ app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Orch
 
 app.MapReverseProxy();
 
-await app.RunAsync();
+await app.RunAsync().ConfigureAwait(false);

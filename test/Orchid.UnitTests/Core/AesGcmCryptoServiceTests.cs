@@ -33,6 +33,50 @@ public sealed class AesGcmCryptoServiceTests
         decryptResult.Value.Should().BeEquivalentTo(plainText);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(16)]
+    [InlineData(31)]
+    [InlineData(33)]
+    public void Encrypt_With_Invalid_Key_Length_Should_Fail(int keyLength)
+    {
+        // Given
+        var service = new AesGcmCryptoService();
+        byte[] invalidKey = new byte[keyLength];
+        byte[] plainText = "Sample Data"u8.ToArray();
+
+        // When
+        var result = service.Encrypt(plainText, invalidKey);
+
+        // Then
+        result.IsFailure.Should().BeTrue();
+        result.Error.Message.Should().Contain("32 bytes");
+    }
+
+    [Fact]
+    public void Decrypt_With_Tampered_Tag_Should_Fail()
+    {
+        // Given
+        var service = new AesGcmCryptoService();
+        byte[] key = new byte[32];
+        RandomNumberGenerator.Fill(key);
+        byte[] plainText = "Sensitive Data"u8.ToArray();
+        var encryptResult = service.Encrypt(plainText, key);
+
+        byte[] tamperedTag = (byte[])encryptResult.Value.Tag.Clone();
+        tamperedTag[0] ^= 0xFF;
+
+        // When
+        var decryptResult = service.Decrypt(
+            encryptResult.Value.CipherText,
+            encryptResult.Value.Nonce,
+            tamperedTag,
+            key);
+
+        // Then
+        decryptResult.IsFailure.Should().BeTrue();
+    }
+
     [Fact]
     public void Decrypt_With_Invalid_Key_Should_Fail()
     {

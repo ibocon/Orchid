@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "owners": [
+    {
+      "ownerKey": "orchid",
+      "planningRoots": [
+        "docs/planning"
+      ],
+      "historyRoots": [
+        "docs/history"
+      ],
+      "requireRelationsFrom": "261013"
+    },
+    {
+      "ownerKey": "garden-harness",
+      "planningRoots": [
+        "lib/Garden.Harness/docs/planning"
+      ],
+      "historyRoots": [
+        "lib/Garden.Harness/docs/history"
+      ],
+      "requireRelationsFrom": "261013"
+    }
+  ]
+}

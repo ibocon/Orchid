@@ -1,16 +1,21 @@
 @namespace Orchid.Mobile.Component
-@using Orchid.Contract.Model
 
-<div class="swipeable-item-container">
-    <div class="item-content">
-        <span class="badge">@ContentType</span>
-        <p class="preview-text">@PreviewText</p>
-    </div>
-    <div class="item-actions">
-        <button class="action-btn pin-btn" @onclick="OnPinClick">📌</button>
-        <button class="action-btn delete-btn" @onclick="OnDeleteClick">🗑️</button>
-    </div>
-</div>
+<MudCard Elevation="1" Class="mb-2">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudChip T="string" Color="Color.Primary" Size="MudSize.Small" Variant="Variant.Filled">
+                @ContentType.ToString()
+            </MudChip>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" OnClick="OnPinClick" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="OnDeleteClick" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">@PreviewText</MudText>
+    </MudCardContent>
+</MudCard>
 
 @code {
     /// <summary>
