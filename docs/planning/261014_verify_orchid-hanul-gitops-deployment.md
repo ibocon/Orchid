@@ -17,7 +17,7 @@
 | --- | --- |
 | 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
 | 직접 출처 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
-| 직접 후속 | [🔄 Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` |
+| 직접 후속 | [✅ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<../history/2610/W3/261014/261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` |
 | 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
 | 검증 대상 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` — 해당 없음 |
 | 착수 조건 | 가능 |
@@ -167,7 +167,7 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | ID | 실행 시각 | 환경과 릴리스 | 입력 | 기대 결과 | 실제 결과 | 증거 | 판정 |
 | --- | --- | --- | --- | --- | --- | --- | :---: |
-| V1 | 2026-10-14 | Hanul Kubernetes (`agents-mcp`) | `kubectl get kustomizations -n flux-system`, `kubectl get externalsecrets -n orchid-staging` | SecretSynced | `orchid-application` READY True(`main@1856e950`), `orchid-staging` 네임스페이스 생성됨. `orchid-staging-controller` READY False: `ExternalSecret/orchid-staging/orchid-api-gateway-external-secret dry-run failed: no matches for kind "ExternalSecret" in version "external-secrets.io/v1beta1"`. 클러스터 CRD는 `v1`만 제공, `orchid-staging`의 ExternalSecret 0건 | Flux Kustomization 상태, `deploy/k8s/overlays/staging/external-secret.yaml` apiVersion | FAIL |
+| V1 | 2026-10-14 | Hanul Kubernetes (`agents-mcp`) | `kubectl get externalsecrets -n orchid-staging` | SecretSynced | 재실행(fix 적용 후). `orchid-staging-controller` READY True(`main@b2e8faaf`). ExternalSecret 2건 `SecretSyncedError`, 이벤트 `error processing spec.dataFrom[0].extract, err: Secret does not exist`. OpenBao `secret/app/stag`에 `orchid/` 없음 | Flux Kustomization 상태, ExternalSecret 상태와 이벤트, `bao kv list secret/app/stag` | BLOCKED |
 | V2 | — | Hanul Kubernetes | `kubectl get pods` | Running 1/1 | — | — | 미실행 |
 | V3 | — | 외부 네트워크 | `curl https://...` | HTTP 200 OK | — | — | 미실행 |
 
@@ -175,14 +175,14 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | 결과 | 시나리오 | 근거 | 후속 조치 |
 | --- | --- | --- | --- |
-| FAIL | V1 | Orchid `deploy/k8s/overlays/{staging,production}/external-secret.yaml`이 클러스터에 없는 `external-secrets.io/v1beta1`을 사용해 Flux 적용이 실패한다 | `fix` 계획으로 승격 |
-| 미실행 | V2, V3 | V1 게이트 미통과 | V1 수정 후 재검증 |
+| BLOCKED | V1 | 1차 FAIL(ExternalSecret `v1beta1`)은 fix 적용 후 해소됐다. 재실행에서 OpenBao `app/stag/orchid/*`가 없어 `SecretSyncedError`. 사전 조건 미충족이라 BLOCKED | 사용자가 OpenBao `app/stag/orchid/api-gateway`, `app/stag/orchid/clipboard`를 등록한 뒤 V1 재실행 |
+| 미실행 | V2, V3 | V1 게이트 미통과. 참고 관찰(판정 아님): Pod 2개 `ImagePullBackOff`(Harbor `401 Unauthorized`, Deployment에 `imagePullSecrets` 없음), Certificate `orchid-stag-tls` READY True(`lets-encrypt`) | V1 통과 후 진행. Pod 이미지 인증은 별도 `fix` 계획이 필요하다 |
 
 ## 결함 승격
 
 | 실패 시나리오 | 변경 유형 | 후속 계획 | 상태 |
 | --- | --- | --- | --- |
-| V1 | `fix` | [⬜ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` | 계획 작성 완료, 구현 대기 |
+| V1 | `fix` | [✅ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<../history/2610/W3/261014/261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` | 구현 완료, Flux 적용 확인. V1은 OpenBao 시크릿 등록 후 재검증 |
 
 ## 작업 순서
 

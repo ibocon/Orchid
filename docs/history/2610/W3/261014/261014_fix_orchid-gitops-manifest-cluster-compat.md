@@ -1,4 +1,4 @@
-# 🔄 Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정
+# ✅ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정
 
 ## 계획 관계
 
@@ -15,11 +15,11 @@
 
 | 구분 | 계획·조건 |
 | --- | --- |
-| 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
-| 직접 출처 | [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
+| 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
+| 직접 출처 | [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../../../../planning/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
 | 직접 후속 | 없음 |
-| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [🔄 Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` |
-| 파생 | [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` — 해당 없음 |
+| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../../../../planning/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [✅ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` |
+| 파생 | [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../../../../planning/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` — 해당 없음 |
 | 착수 조건 | 가능 |
 <!-- plan-relations-summary:end -->
 
@@ -300,9 +300,10 @@ Describe 'Orchid overlay 클러스터 호환성' -ForEach @('staging', 'producti
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| Flux 적용 | 푸시 후 `orchid-staging-controller`가 READY True가 되는지 확인한다. 클러스터 검증은 `orchid:261014_verify_orchid-hanul-gitops-deployment`의 V1~V3로 이관한다 | 미확인 |
-| OpenBao 시크릿 | `app/stag/orchid/api-gateway`, `app/stag/orchid/clipboard`가 등록돼야 V1이 `SecretSynced`가 된다. 결정 2에 따라 사용자 입력 | 미확인 |
-| 이미지 존재 | `harbor.hanul.botanicsoft.com/orchid/{api-gateway,clipboard}:stag-dev` 이미지가 Harbor에 있는지 확인한다. 없으면 V2가 `ImagePullBackOff`로 막힌다 | 미확인 |
+| Flux 적용 | 푸시 후 `orchid-staging-controller`가 READY True가 되는지 확인한다. 클러스터 검증은 `orchid:261014_verify_orchid-hanul-gitops-deployment`의 V1~V3로 이관한다 | 확인(2026-10-14): READY True, `main@b2e8faaf`. ExternalSecret 2건, Deployment 2건, Service 2건, Ingress 생성됨 |
+| 인증서 발급 | Ingress `lets-encrypt`로 `orchid-stag-tls`가 발급되는지 확인한다 | 확인(2026-10-14): Certificate READY True, ISSUER `lets-encrypt`, HTTP-01 검증 통과 |
+| OpenBao 시크릿 | `app/stag/orchid/api-gateway`, `app/stag/orchid/clipboard`가 등록돼야 V1이 `SecretSynced`가 된다. 결정 2에 따라 사용자 입력 | 미충족 확인: ExternalSecret `Secret does not exist`. 이관: 검증 계획 V1 |
+| 이미지 | Harbor 이미지 pull이 가능한지 확인한다 | 별도 결함: `401 Unauthorized`, Deployment에 `imagePullSecrets` 없음. 이 계획 범위 밖이며 별도 `fix` 계획이 필요하다 |
 
 ## 계획 평가
 
@@ -328,4 +329,4 @@ Describe 'Orchid overlay 클러스터 호환성' -ForEach @('staging', 'producti
 2. ✅ Step 1: 두 overlay의 ExternalSecret `apiVersion`을 변경한다.
 3. ✅ Step 2: 두 overlay의 Ingress ClusterIssuer를 변경한다.
 4. ✅ Pester와 `Test-KustomizationBuild.ps1`을 통과시킨다.
-5. 푸시 후 `orchid-staging-controller` READY와 `orchid:261014_verify_orchid-hanul-gitops-deployment` V1을 재검증한다.
+5. ✅ 푸시 후 `orchid-staging-controller` READY를 확인하고 `orchid:261014_verify_orchid-hanul-gitops-deployment` V1 재검증으로 이관한다.
