@@ -16,6 +16,8 @@ spec:
         app.kubernetes.io/name: orchid-clipboard
         app.kubernetes.io/part-of: orchid
     spec:
+      imagePullSecrets:
+        - name: harbor-registry
       containers:
         - name: clipboard
           image: harbor.hanul.botanicsoft.com/orchid/clipboard:latest

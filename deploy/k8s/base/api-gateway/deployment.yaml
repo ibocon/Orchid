@@ -16,6 +16,8 @@ spec:
         app.kubernetes.io/name: orchid-api-gateway
         app.kubernetes.io/part-of: orchid
     spec:
+      imagePullSecrets:
+        - name: harbor-registry
       containers:
         - name: api-gateway
           image: harbor.hanul.botanicsoft.com/orchid/api-gateway:latest

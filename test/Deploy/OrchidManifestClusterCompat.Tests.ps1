@@ -40,4 +40,25 @@ Describe 'Orchid overlay 클러스터 호환성' -ForEach @('staging', 'producti
         # Then
         $script:ClusterIssuers | Should -Contain $Issuer
     }
+
+    It 'Given <_> overlay, When 렌더링, Then 모든 Deployment 가 harbor-registry 를 imagePullSecrets 로 참조한다' {
+        # Given
+        $Manifest = Get-RenderedManifest -Overlay $_
+
+        # When
+        $DeploymentCount = [regex]::Matches($Manifest, '(?m)^kind: Deployment$').Count
+        $PullSecretCount = [regex]::Matches($Manifest, '(?m)^\s+imagePullSecrets:\r?\n\s+- name: harbor-registry$').Count
+
+        # Then
+        $PullSecretCount | Should -Be $DeploymentCount
+    }
+
+    It 'Given <_> overlay, When 렌더링, Then harbor-registry ExternalSecret 이 dockerconfigjson 으로 생성된다' {
+        # Given
+        $Manifest = Get-RenderedManifest -Overlay $_
+
+        # When / Then
+        $Manifest | Should -Match 'remoteRef:\s+key: infra/harbor/registry-pull'
+        $Manifest | Should -Match 'type: kubernetes\.io/dockerconfigjson'
+    }
 }

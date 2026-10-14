@@ -4,6 +4,7 @@ namespace: orchid-staging
 resources:
   - ../../base
   - external-secret.yaml
+  - harbor-registry-external-secret.yaml
   - ingress.yaml
 images:
   - name: harbor.hanul.botanicsoft.com/orchid/api-gateway
