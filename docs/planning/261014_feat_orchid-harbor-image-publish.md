@@ -162,7 +162,7 @@ sequenceDiagram
 
 ## 단계별 수정 계획
 
-### ⬜ Step 1: Harbor 프로젝트·robot 발급 스크립트로 자격 준비
+### ✅ Step 1: Harbor 프로젝트·robot 발급 스크립트로 자격 준비
 
 **파일**: `lib/Garden.Harness/src/kubernetes/scripts/New-HarborProjectRobot.ps1`
 
@@ -585,7 +585,7 @@ Harbor API(`Invoke-HarborApi`), OpenBao(`Get-OpenBaoKvData`·`Set-OpenBaoKvData`
 
 ## 작업 순서
 
-1. ⬜ Step 1: `New-HarborProjectRobot.ps1`과 테스트를 작성하고 `-WhatIf`를 사용자에게 보인 뒤, 승인 시 실행해 자격을 준비한다. 에이전트가 read-only로 결과를 확인한다.
+1. ✅ Step 1: `New-HarborProjectRobot.ps1`과 테스트를 작성하고 `-WhatIf`를 사용자에게 보인 뒤, 승인 시 실행해 자격을 준비한다. 에이전트가 read-only로 결과를 확인한다.
 2. ⬜ `OrchidImagePublish.Tests.ps1`을 작성하고 기존 테스트 기대값을 갱신해 실패(Red)를 확인한다.
 3. ⬜ Step 2~4: `.dockerignore`, Dockerfile 2개, workflow 2개를 추가하고 로컬 `docker build` 스모크를 통과시킨다.
 4. ⬜ Step 5: overlay pull 자격 key를 교체한다.
