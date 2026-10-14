@@ -146,7 +146,7 @@ bearer_token_env_var = "GITHUB_PERSONAL_ACCESS_TOKEN"
 url = "https://learn.microsoft.com/api/mcp"
 
 [mcp_servers.penpot]
-url = "https://design.penpot.app/mcp/stream?userToken=eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2R0NNIn0.0Wz4nip7jtU9WzYBRsdqdQut1e4nzG7xzNvuLcZTGis0S40scRQ-gg._euOVkSx2ut4yBVV.PzSTUfl2absRIf3ZgmATJHlUCv6ocVANlHpVsSBj6IXtwSm2CSgaGy_m2vpYBSVnIbgzD4fj0laXkh877frty0pkLNvFxT0qDAQerhLgTthLIJUvMqyp3nDEypA9HP6V6jSau7JSMgh6i7mI_2sNusabcOY-tQEhcdw40pjUigpyvs3vepV54D_Bi8vKClGOJf9M7BqKhekc.AzxgnqC_B8YFEQ0FgV6SFA"
+url = "https://design.penpot.app/mcp/stream?userToken=eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2R0NNIn0.pcKwIKE-z417oa8zT-tGCX9uLjgVFAtEq4KbDbrcM0pEdq8h7e1W0w.NvnBAqLTQBglgpEt.IBu0u1Xm3A-rWjopC9cAOQ7FhRj86IxJl3nr6RPQ6xZhUGct-qj0XqXFevrXDoHcke0TD-PvaC6Cyv1i79eC7KH2R4drKF0vwTG2YmfHM2UtJPafajNnFjsiukoFv_9GwiX0_Yi9boS7FGeHQzInLm06xQ__-yS18snjfrqTt6JRSgTAWiPkr5QLDoClBG3g9CML2MRVOH0y.Kz-lV5SYKKea_HEROYee2w"
 
 [shell_environment_policy]
 inherit = "core"
