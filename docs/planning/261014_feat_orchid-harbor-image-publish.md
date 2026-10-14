@@ -44,6 +44,7 @@
 | 서비스 프로젝트 | `src/Service/ApiGateway/Orchid.ApiGateway.csproj`(Yarp), `src/Service/Clipboard/Orchid.Service.Clipboard.csproj`(→ `src/Shared/Contract`). 둘 다 `net10.0`, `/health` 노출, 포트 8080 |
 | 앱 시크릿 | `app/stag/orchid/*` 등록 완료, ExternalSecret 2건 `Ready` |
 | 경보 | `KubePodNotReady` ×2, `KubeDeploymentReplicasMismatch` ×2 firing |
+| 병행 초안 | 같은 날 다른 세션이 작성한 미커밋 초안 `261014_feat_orchid-image-publish-pipeline`(로컬 PowerShell 퍼블리시)은 사용자 결정으로 이 계획이 정본이 되면서 철회됐다. 커밋·history 이력은 없다. 불변 태그 정책과 Harbor 작업 사용자 수행 결정은 이 계획과 같다 |
 
 ### 원인 분석
 
