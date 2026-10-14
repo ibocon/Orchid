@@ -1,4 +1,4 @@
-# ⬜ Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정
+# 🔄 Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정
 
 ## 계획 관계
 
@@ -279,8 +279,8 @@ resources:
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| pull secret 동기화 | 푸시 후 `orchid-staging/harbor-registry` ExternalSecret이 `SecretSynced`인지 확인한다 | 미확인 |
-| 이미지 존재 | `orchid/api-gateway:stag-dev`, `orchid/clipboard:stag-dev`가 Harbor에 퍼블리시돼 있는지 확인한다. 익명 401은 존재 여부를 가리지 않아 현재 미검증이다. 없으면 pull secret 반영 후 `not found`로 바뀐다 | 미확인 |
+| pull secret 동기화 | 푸시 후 `orchid-staging/harbor-registry` ExternalSecret이 `SecretSynced`인지 확인한다 | 확인(2026-10-14, `main@7dc295e`): `SecretSynced` True. 새 ReplicaSet Pod가 `harbor-registry`를 참조한다 |
+| 이미지 존재 | `orchid/api-gateway:stag-dev`, `orchid/clipboard:stag-dev`가 Harbor에 퍼블리시돼 있는지 확인한다 | 별도 결함: pull secret 반영 후에도 `401 Unauthorized`. Peony는 Harbor `garden` 프로젝트(Garden.Cluster 매니페스트 74곳)를 쓰고, Orchid 저장소에는 Harbor 퍼블리시 경로(workflow·스크립트)가 없다. `orchid` 프로젝트 존재·robot 권한·이미지 퍼블리시는 미확인이며 별도 `feat` 계획(Orchid 이미지 퍼블리시)이 필요하다 |
 | 앱 시크릿 | 결정 3에 따라 사용자가 `app/stag/orchid/api-gateway`, `app/stag/orchid/clipboard`를 등록해야 Pod가 `CreateContainerConfigError` 없이 기동한다 | 미충족 |
 | 경보 해소 | `KubePodNotReady`, `KubeDeploymentReplicasMismatch`가 resolved 되는지 확인한다. 검증 계획 V2로 이관 | 미확인 |
 
@@ -307,4 +307,4 @@ resources:
 2. ✅ Step 1: base Deployment 2개에 `imagePullSecrets`를 추가한다.
 3. ✅ Step 2: 두 overlay에 `harbor-registry` ExternalSecret을 추가한다.
 4. ✅ Pester와 `Test-KustomizationBuild.ps1`을 통과시킨다.
-5. ⬜ 푸시 후 `harbor-registry` 동기화와 이미지 pull을 확인하고 `orchid:261014_verify_orchid-hanul-gitops-deployment` V2로 이관한다.
+5. ✅ 푸시 후 `harbor-registry` 동기화를 확인했다. 이미지 pull은 이미지 퍼블리시 결함으로 막혀 있어 `orchid:261014_verify_orchid-hanul-gitops-deployment` V2로 이관한다.
