@@ -28,8 +28,16 @@
 - 근거: 현재 overlay의 `stag-dev`는 움직이는 태그다. Deployment가 `imagePullPolicy: IfNotPresent`라 같은 태그로 다시 push해도 노드가 새 이미지를 받지 않는다. Peony도 `stag-{stamp}-{sha}` 불변 태그를 쓴다. 최초 반영은 수동 커밋으로 하고, Flux image automation 연결은 별도 계획으로 둔다.
 - 대안: `stag-dev`를 유지하고 `imagePullPolicy: Always`로 바꾼다. 롤백 지점이 사라져 채택하지 않는다.
 
-5. **Harbor 관리 작업 수행 주체** — 사용자가 수행한다 (사용자 판단 필요)
-- 근거: 프로젝트·robot 생성에는 Harbor 관리자 인증이 필요하다. robot 토큰 등록은 OpenBao와 GitHub secret 등록을 거친다. 에이전트는 자격 증명을 입력하지 않는다. 사용자 절차는 Step 1에 적는다.
+5. **Harbor 관리 작업 수행 방식** — 하네스 스크립트 `New-HarborProjectRobot.ps1`로 프로젝트·robot 발급과 자격 저장을 한 번에 수행한다 (사용자 결정)
+- 근거: OpenBao `infra/harbor/retention`에 Harbor 로컬 관리자(`admin`, `sysadmin_flag=True`)가 있고 Harbor `v2.15.1` REST API로 프로젝트·robot을 만들 수 있다. 발급 시 한 번만 돌려주는 robot 토큰을 스크립트가 출력 없이 OpenBao(stdin JSON)와 GitHub secret(`gh secret set` stdin)에 바로 저장하므로 토큰이 사람 손과 대화에 남지 않는다. 제품 중립 스크립트로 하네스 `src/kubernetes/scripts/`에 둔다.
+- 대안: Harbor UI 수작업. 토큰 복사 과정에서 노출 위험이 있어 채택하지 않는다.
+
+6. **robot 만료 기간** — 365일로 명시한다 (권장)
+- 근거: Harbor 기본값에 기대지 않고 만료를 예측 가능하게 둔다. 만료 전 `-Rotate`로 토큰을 새로 발급해 두 저장소를 함께 갱신한다.
+- 대안: 무기한(`-1`). 유출 시 피해 기간이 무제한이라 채택하지 않는다.
+
+7. **관리자 자격 재사용** — retention용 관리자 자격을 프로젝트 발급에도 쓴다 (사용자 확인)
+- 근거: Garden.Cluster `docs/harbor-retention.md`는 이 관리자 자격을 "일반 pull/push robot과 공유하지 않는다"고 규정한다. 스크립트는 관리자 자격으로 robot을 만들 뿐 그 자격을 robot이나 다른 저장소로 넘기지 않으므로 규정과 충돌하지 않는다.
 
 ## 배경
 
@@ -117,7 +125,9 @@ graph LR
 
 | 레이어 | 파일 | 변경 내용 |
 | --- | --- | --- |
-| Harbor·OpenBao·GitHub | (저장소 밖, 사용자 수행) | `orchid` 프로젝트, robot 2개, OpenBao `infra/harbor/orchid-registry-pull`, `ibocon/Orchid` Actions secret 3개 |
+| 하네스 스크립트 | `lib/Garden.Harness/src/kubernetes/scripts/New-HarborProjectRobot.ps1` | 신규. Harbor `orchid` 프로젝트, robot 2개 발급과 OpenBao·GitHub secret 저장 진입점 |
+| 하네스 스크립트 | `lib/Garden.Harness/src/kubernetes/scripts/HarborProjectRobot.Common.ps1` | 신규. Harbor API·OpenBao·gh 호출 함수와 발급 흐름 |
+| 하네스 테스트 | `lib/Garden.Harness/src/kubernetes/test/HarborProjectRobot.Tests.ps1` | 신규. Harbor·OpenBao·gh mock 으로 발급·멱등·회전·WhatIf·비노출 검증 |
 | 빌드 | `.dockerignore` | 신규. `bin/`, `obj/`, `.git`, `.env*`, `.secrets/`, `lib/` 제외 |
 | 빌드 | `src/Service/ApiGateway/Dockerfile` | 신규. sdk 10.0 build → aspnet 10.0 final |
 | 빌드 | `src/Service/Clipboard/Dockerfile` | 신규. `src/Shared/Contract` 포함 |
@@ -152,21 +162,47 @@ sequenceDiagram
 
 ## 단계별 수정 계획
 
-### ⬜ Step 1: Harbor·OpenBao·GitHub 자격 준비 (사용자 수행)
+### ⬜ Step 1: Harbor 프로젝트·robot 발급 스크립트로 자격 준비
 
-코드 변경 없음. 사용자가 아래 순서로 수행하고, 에이전트가 read-only로 결과를 확인한다.
+**파일**: `lib/Garden.Harness/src/kubernetes/scripts/New-HarborProjectRobot.ps1`
 
-1. Harbor UI(`https://harbor.hanul.botanicsoft.com`) → Projects → New Project `orchid` (Access Level: Private).
-2. `orchid` → Robot Accounts에서 두 계정을 만든다.
-   - `ci-push`: Repository `push`, `pull` / Artifact `read` / Tag `create`. GitHub Actions 전용.
-   - `orchid-pull-flux`: Repository `pull`. 클러스터 전용.
-3. pull robot 자격을 OpenBao에 넣는다. `.dockerconfigjson` 값은 `{"auths":{"harbor.hanul.botanicsoft.com":{"username":"robot$orchid+orchid-pull-flux","password":"<token>","auth":"<base64(username:token)>"}}}` 형식이다.
+**파일**: `lib/Garden.Harness/src/kubernetes/scripts/HarborProjectRobot.Common.ps1`
 
-   ```bash
-   bao kv put secret/infra/harbor/orchid-registry-pull .dockerconfigjson=@orchid-dockerconfig.json
-   ```
+TO-BE (흐름 요지):
 
-4. `ibocon/Orchid` → Settings → Secrets and variables → Actions에 `HARBOR_REGISTRY`(`harbor.hanul.botanicsoft.com`), `HARBOR_USERNAME`(`robot$orchid+ci-push`), `HARBOR_PASSWORD`(토큰)를 등록한다.
+```powershell
+# ✅ 외부 호출은 Invoke-HarborApi, Get-OpenBaoKvData, Set-OpenBaoKvData, Set-GitHubActionsSecret 로만 한다
+$Headers = Get-HarborAdminHeader -AdminSecretPath 'infra/harbor/retention'
+$ProjectRecord = Get-HarborProject -HarborUrl $HarborUrl -Headers $Headers -Project 'orchid'
+if ($null -eq $ProjectRecord) {
+    # POST /projects { project_name = 'orchid'; metadata = @{ public = 'false' } }
+}
+foreach ($Robot in $Robots) {
+    # 없으면 POST /robots { level = 'project'; duration = 365; permissions = project/orchid 최소 권한 }
+    # 있으면 기본은 건너뛰고, -Rotate 일 때만 PATCH /robots/{id} { secret = '' } 로 새 토큰 발급
+    # Pull: .dockerconfigjson 을 OpenBao infra/harbor/orchid-registry-pull 에 stdin 으로 저장
+    # Push: HARBOR_REGISTRY, HARBOR_USERNAME, HARBOR_PASSWORD 를 gh secret set stdin 으로 등록
+}
+```
+
+| robot | 권한 | 토큰 저장 위치 |
+| --- | --- | --- |
+| `robot$orchid+orchid-pull-flux` | repository pull | OpenBao `infra/harbor/orchid-registry-pull` (`.dockerconfigjson`) |
+| `robot$orchid+ci-push` | repository push·pull, artifact read, tag create | `ibocon/Orchid` Actions secret `HARBOR_REGISTRY`·`HARBOR_USERNAME`·`HARBOR_PASSWORD` |
+
+실행 순서 (실제 생성은 `-WhatIf` 결과를 사용자에게 보인 뒤 승인 시 실행한다):
+
+```powershell
+$Arguments = @{
+    Project = 'orchid'
+    GitHubRepository = 'ibocon/Orchid'
+    PushRobotName = 'ci-push'
+    PullRobotName = 'orchid-pull-flux'
+    PullSecretPath = 'infra/harbor/orchid-registry-pull'
+}
+& lib/Garden.Harness/src/kubernetes/scripts/New-HarborProjectRobot.ps1 @Arguments -WhatIf
+& lib/Garden.Harness/src/kubernetes/scripts/New-HarborProjectRobot.ps1 @Arguments
+```
 
 에이전트 확인 (값은 출력하지 않는다):
 
@@ -476,18 +512,39 @@ TO-BE:
         $Manifest | Should -Match 'remoteRef:\s+key: infra/harbor/orchid-registry-pull'
 ```
 
+### ✅ 테스트: `HarborProjectRobot.Tests.ps1`
+
+**파일**: `lib/Garden.Harness/src/kubernetes/test/HarborProjectRobot.Tests.ps1`
+
+Harbor API(`Invoke-HarborApi`), OpenBao(`Get-OpenBaoKvData`·`Set-OpenBaoKvData`), GitHub(`Set-GitHubActionsSecret`)를 Pester `Mock`으로 대체한다. 실제 Harbor에서 확인한 `Invoke-RestMethod` 배열 반환 형태(배열 객체 하나)를 회귀 테스트로 고정한다.
+
+| 시나리오 | 기대 |
+| --- | --- |
+| 배열을 단일 객체로 반환 | `Get-HarborProject`가 이름이 같은 프로젝트를 찾는다 |
+| 빈 배열 응답 | null |
+| 프로젝트 없음 / 있음 | 비공개 생성 / 생성 호출 없음 |
+| robot 없음 | pull은 `repository.pull`만, push는 `repository.push` 포함. duration 365 |
+| robot 없음 | pull 토큰은 OpenBao `.dockerconfigjson`, push 토큰은 GitHub secret 3개 |
+| robot 있음, `-Rotate` 없음 | 쓰기 호출 없음, `Exists` |
+| robot 있음, `-Rotate` | PATCH 2회, 새 토큰 저장 |
+| `-WhatIf` | 쓰기 호출 없음, `WouldCreate` |
+| 결과 출력 | 토큰·관리자 비밀번호 비포함 |
+
 ### 테스트 요약
 
 | 테스트 클래스 | 검증 대상 | 테스트 수 |
 | --- | --- | --- |
 | `OrchidImagePublish.Tests.ps1` | workflow 2, Dockerfile 2, overlay pull 자격 2, staging 불변 태그 1 | 7 |
 | `OrchidManifestClusterCompat.Tests.ps1` | 기존 8 (pull 자격 key 기대값 갱신) | 8 |
-| **합계** | | **15** |
+| `HarborProjectRobot.Tests.ps1` | 프로젝트·robot 발급, 멱등, 회전, WhatIf, 비노출, 배열 응답 회귀 | 11 |
+| **합계** | | **26** |
 
 ### 테스트 결과
 
 | 범위 | 실행 명령 | 총 테스트 | 통과 | 실패 | 결과 |
 | --- | --- | ---: | ---: | ---: | :---: |
+| 하네스 스크립트 | `pwsh -NoProfile -Command "Invoke-Pester lib/Garden.Harness/src/kubernetes/test/HarborProjectRobot.Tests.ps1"` | 11 | 11 | 0 | ✅ |
+| 실 Harbor dry-run | `New-HarborProjectRobot.ps1 ... -WhatIf` (GET만 수행. 대조: `garden#2`, `robot$garden+garden-pull-flux-20260912153851` 조회 성공) | — | — | — | ✅ exit 0, `project/orchid`·robot 2개 `WouldCreate` |
 | 수정 전 (Red) | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | — | — | — | ⬜ |
 | 변경 범위 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | — | — | — | ⬜ |
 | 이미지 빌드 스모크 | `docker build -f src/Service/ApiGateway/Dockerfile .` / `docker build -f src/Service/Clipboard/Dockerfile .` (push 없음) | — | — | — | ⬜ |
@@ -528,7 +585,7 @@ TO-BE:
 
 ## 작업 순서
 
-1. ⬜ Step 1: 사용자가 Harbor·OpenBao·GitHub 자격을 준비하고, 에이전트가 read-only로 확인한다.
+1. ⬜ Step 1: `New-HarborProjectRobot.ps1`과 테스트를 작성하고 `-WhatIf`를 사용자에게 보인 뒤, 승인 시 실행해 자격을 준비한다. 에이전트가 read-only로 결과를 확인한다.
 2. ⬜ `OrchidImagePublish.Tests.ps1`을 작성하고 기존 테스트 기대값을 갱신해 실패(Red)를 확인한다.
 3. ⬜ Step 2~4: `.dockerignore`, Dockerfile 2개, workflow 2개를 추가하고 로컬 `docker build` 스모크를 통과시킨다.
 4. ⬜ Step 5: overlay pull 자격 key를 교체한다.
