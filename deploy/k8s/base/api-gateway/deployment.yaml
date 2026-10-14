@@ -30,10 +30,13 @@ spec:
             - name: ASPNETCORE_URLS
               value: "http://+:8080"
           envFrom:
-            - configMapRef:
-                name: orchid-api-gateway-config-map
             - secretRef:
                 name: orchid-api-gateway-secret
+          volumeMounts:
+            - name: app-settings
+              mountPath: /app/appsettings.json
+              subPath: appsettings.json
+              readOnly: true
           resources:
             requests:
               cpu: 100m
@@ -41,3 +44,7 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+      volumes:
+        - name: app-settings
+          configMap:
+            name: orchid-api-gateway-config-map

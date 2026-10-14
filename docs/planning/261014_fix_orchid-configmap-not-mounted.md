@@ -1,4 +1,4 @@
-# ⬜ Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정
+# 🔄 Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정
 
 ## 계획 관계
 
@@ -113,7 +113,7 @@ graph LR
 
 ## 단계별 수정 계획
 
-### ⬜ Step 1: api-gateway Deployment에 설정 파일 마운트
+### ✅ Step 1: api-gateway Deployment에 설정 파일 마운트
 
 **파일**: `deploy/k8s/base/api-gateway/deployment.yaml`
 
@@ -146,7 +146,7 @@ TO-BE:
             name: orchid-api-gateway-config-map
 ```
 
-### ⬜ Step 2: clipboard Deployment에 설정 파일 마운트
+### ✅ Step 2: clipboard Deployment에 설정 파일 마운트
 
 **파일**: `deploy/k8s/base/clipboard/deployment.yaml`
 
@@ -185,7 +185,7 @@ TO-BE:
 > 프레임워크: Pester 5
 > 패턴: Given/When/Then (Four-Phase Test). 클러스터와 이미지 없이 `kubectl kustomize` 렌더링 결과만 사용한다.
 
-### ⬜ 테스트용 Stub 정의
+### ✅ 테스트용 Stub 정의
 
 **파일**: `test/Deploy/OrchidConfigMount.Tests.ps1`
 
@@ -206,7 +206,7 @@ BeforeAll {
 }
 ```
 
-### ⬜ 테스트: `OrchidConfigMount.Tests.ps1`
+### ✅ 테스트: `OrchidConfigMount.Tests.ps1`
 
 **파일**: `test/Deploy/OrchidConfigMount.Tests.ps1`
 
@@ -263,10 +263,14 @@ Describe 'Orchid ConfigMap 설정 파일 마운트' -ForEach @('staging', 'produ
 
 | 범위 | 실행 명령 | 총 테스트 | 통과 | 실패 | 결과 |
 | --- | --- | ---: | ---: | ---: | :---: |
-| 변경 범위 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy/OrchidConfigMount.Tests.ps1"` | — | — | — | ⬜ |
-| 전체 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | — | — | — | ⬜ |
+| 수정 전 (Red) | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy/OrchidConfigMount.Tests.ps1"` | 6 | 2 | 4 | ✅ 의도한 실패 |
+| 변경 범위 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy/OrchidConfigMount.Tests.ps1"` | 6 | 6 | 0 | ✅ |
+| 전체 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | 14 | 14 | 0 | ✅ |
+| 빌드 | `Test-KustomizationBuild.ps1 -KustomizationPath @('deploy/k8s/overlays/staging/kustomization.yaml','deploy/k8s/overlays/production/kustomization.yaml')` | — | — | — | ✅ exit 0 |
 
-**실행 일시**: 미실행
+**실행 일시**: 2026-10-14
+
+> Red에서 통과한 2개는 목적지 주소와 Service 이름·포트의 정합성 테스트다. ConfigMap 내용은 원래 맞았고, 문제는 적용 방식이어서 회귀 방지 용도로 유지한다.
 
 <!-- NOTE: 실기기(Android/iOS 디바이스) 조작이나 Staging 수동 검증은 여기에 작성할 수 없습니다. 필요한 경우 별도의 후속 verify 계획서(YYMMDD_verify_*.md)로 분리하십시오. -->
 
@@ -298,8 +302,8 @@ Describe 'Orchid ConfigMap 설정 파일 마운트' -ForEach @('staging', 'produ
 
 ## 작업 순서
 
-1. `test/Deploy/OrchidConfigMount.Tests.ps1`을 먼저 작성하고 실패(Red)를 확인한다.
-2. Step 1: api-gateway Deployment를 수정한다.
-3. Step 2: clipboard Deployment를 수정한다.
-4. Pester와 `Test-KustomizationBuild.ps1`을 통과시킨다.
+1. ✅ `test/Deploy/OrchidConfigMount.Tests.ps1`을 먼저 작성하고 실패(Red)를 확인한다.
+2. ✅ Step 1: api-gateway Deployment를 수정한다.
+3. ✅ Step 2: clipboard Deployment를 수정한다.
+4. ✅ Pester와 `Test-KustomizationBuild.ps1`을 통과시킨다.
 5. 이미지 퍼블리시 계획이 끝나 Pod가 기동하면 프록시 동작을 사용자 실행 검증으로 확인한다.
