@@ -17,7 +17,7 @@
 | --- | --- |
 | 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
 | 직접 출처 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
-| 직접 후속 | 없음 |
+| 직접 후속 | [🔄 Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` |
 | 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
 | 검증 대상 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` — 해당 없음 |
 | 착수 조건 | 가능 |
@@ -56,6 +56,12 @@
 | --- | --- | --- | --- |
 | Kubeconfig 컨텍스트 | `kubectl config current-context` | Hanul 클러스터 컨텍스트 | 미충족 |
 | OpenBao 시크릿 등록 | OpenBao `app/stag/orchid/*` 경로 | 필수 시크릿 주입 완료 | 미충족 |
+
+```bash
+# 사전 조회 (2026-10-14, Hanul `agents-mcp` 컨텍스트)
+kubectl get namespaces
+# orchid-staging 네임스페이스는 Garden.Cluster bootstrap/namespaces/orchid-staging.yaml 로 생성된다
+```
 
 ## 사용자 실행 절차
 
@@ -161,7 +167,7 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | ID | 실행 시각 | 환경과 릴리스 | 입력 | 기대 결과 | 실제 결과 | 증거 | 판정 |
 | --- | --- | --- | --- | --- | --- | --- | :---: |
-| V1 | 2026-10-14 | Hanul Kubernetes (`agents-mcp`) | `kubectl get externalsecrets -n orchid-staging` | SecretSynced | 출력 없음. `orchid-staging` 네임스페이스 미존재. `orchid-application` GitRepository `READY False`: `secrets "orchid-deploy-key" not found` | namespaces 목록, `flux-system` gitrepositories 조회 | BLOCKED |
+| V1 | 2026-10-14 | Hanul Kubernetes (`agents-mcp`) | `kubectl get kustomizations -n flux-system`, `kubectl get externalsecrets -n orchid-staging` | SecretSynced | `orchid-application` READY True(`main@1856e950`), `orchid-staging` 네임스페이스 생성됨. `orchid-staging-controller` READY False: `ExternalSecret/orchid-staging/orchid-api-gateway-external-secret dry-run failed: no matches for kind "ExternalSecret" in version "external-secrets.io/v1beta1"`. 클러스터 CRD는 `v1`만 제공, `orchid-staging`의 ExternalSecret 0건 | Flux Kustomization 상태, `deploy/k8s/overlays/staging/external-secret.yaml` apiVersion | FAIL |
 | V2 | — | Hanul Kubernetes | `kubectl get pods` | Running 1/1 | — | — | 미실행 |
 | V3 | — | 외부 네트워크 | `curl https://...` | HTTP 200 OK | — | — | 미실행 |
 
@@ -169,14 +175,14 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | 결과 | 시나리오 | 근거 | 후속 조치 |
 | --- | --- | --- | --- |
-| BLOCKED | V1 | `orchid-deploy-key` Secret 미등록으로 Orchid 소스 동기화 실패, `orchid-staging` 미생성 | Garden.Cluster 검증 계획 V2(Deploy Key 등록) 수행 후 V1 재실행 |
-| 미실행 | V2, V3 | V1 게이트 미통과 | V1 통과 후 진행 |
+| FAIL | V1 | Orchid `deploy/k8s/overlays/{staging,production}/external-secret.yaml`이 클러스터에 없는 `external-secrets.io/v1beta1`을 사용해 Flux 적용이 실패한다 | `fix` 계획으로 승격 |
+| 미실행 | V2, V3 | V1 게이트 미통과 | V1 수정 후 재검증 |
 
 ## 결함 승격
 
 | 실패 시나리오 | 변경 유형 | 후속 계획 | 상태 |
 | --- | --- | --- | --- |
-| — | — | — | 해당 없음 |
+| V1 | `fix` | [⬜ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` | 계획 작성 완료, 구현 대기 |
 
 ## 작업 순서
 
