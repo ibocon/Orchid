@@ -167,7 +167,7 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | ID | 실행 시각 | 환경과 릴리스 | 입력 | 기대 결과 | 실제 결과 | 증거 | 판정 |
 | --- | --- | --- | --- | --- | --- | --- | :---: |
-| V1 | 2026-10-14 | Hanul Kubernetes (`agents-mcp`) | `kubectl get externalsecrets -n orchid-staging` | SecretSynced | 재실행(fix 적용 후). `orchid-staging-controller` READY True(`main@b2e8faaf`). ExternalSecret 2건 `SecretSyncedError`, 이벤트 `error processing spec.dataFrom[0].extract, err: Secret does not exist`. OpenBao `secret/app/stag`에 `orchid/` 없음 | Flux Kustomization 상태, ExternalSecret 상태와 이벤트, `bao kv list secret/app/stag` | BLOCKED |
+| V1 | 2026-10-14 | Hanul Kubernetes (`agents-mcp`) | `kubectl get externalsecrets -n orchid-staging` | SecretSynced | 3건 모두 `STATUS SecretSynced`, `READY True`: `orchid-api-gateway-external-secret`(LAST SYNC 13m), `orchid-clipboard-external-secret`(13m), `harbor-registry`(38m). 사용자가 OpenBao `app/stag/orchid/{api-gateway,clipboard}`에 `PLACEHOLDER`를 등록한 뒤 동기화됨. ExternalSecret 이벤트 오류 없음 | ExternalSecret 상태 조회 결과 | PASS |
 | V2 | — | Hanul Kubernetes | `kubectl get pods` | Running 1/1 | — | — | 미실행 |
 | V3 | — | 외부 네트워크 | `curl https://...` | HTTP 200 OK | — | — | 미실행 |
 
@@ -175,8 +175,8 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | 결과 | 시나리오 | 근거 | 후속 조치 |
 | --- | --- | --- | --- |
-| BLOCKED | V1 | 1차 FAIL(ExternalSecret `v1beta1`)은 fix 적용 후 해소됐다. 재실행에서 OpenBao `app/stag/orchid/*`가 없어 `SecretSyncedError`. 사전 조건 미충족이라 BLOCKED | 사용자가 OpenBao `app/stag/orchid/api-gateway`, `app/stag/orchid/clipboard`를 등록한 뒤 V1 재실행 |
-| 미실행 | V2, V3 | V1 게이트 미통과. 참고 관찰(판정 아님): Pod 2개 `ImagePullBackOff`(Harbor `401 Unauthorized`, Deployment에 `imagePullSecrets` 없음), Certificate `orchid-stag-tls` READY True(`lets-encrypt`) | V1 통과 후 진행. Pod 이미지 인증은 별도 `fix` 계획이 필요하다 |
+| PASS | V1 | 3차 실행. OpenBao `app/stag/orchid/*` 등록 후 ExternalSecret 2건이 `SecretSynced`. 1차 FAIL(`v1beta1`)은 fix로, 2차 BLOCKED(시크릿 부재)는 사용자 등록으로 해소됨 | V2 진행 |
+| 미실행 | V2, V3 | V2 게이트(V1 통과)는 열렸으나 Pod 4개가 `ImagePullBackOff`(이미지 미퍼블리시)라 통과 기준을 충족할 수 없다. 참고 관찰이며 판정 아님. Certificate `orchid-stag-tls`는 READY True | 이미지 퍼블리시(`orchid:261014_feat_orchid-harbor-image-publish`) 후 V2 재실행 |
 
 ## 결함 승격
 
