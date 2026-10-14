@@ -161,7 +161,7 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | ID | 실행 시각 | 환경과 릴리스 | 입력 | 기대 결과 | 실제 결과 | 증거 | 판정 |
 | --- | --- | --- | --- | --- | --- | --- | :---: |
-| V1 | — | Hanul Kubernetes | `kubectl get externalsecrets` | SecretSynced | — | — | 미실행 |
+| V1 | 2026-10-14 | Hanul Kubernetes (`agents-mcp`) | `kubectl get externalsecrets -n orchid-staging` | SecretSynced | 출력 없음. `orchid-staging` 네임스페이스 미존재. `orchid-application` GitRepository `READY False`: `secrets "orchid-deploy-key" not found` | namespaces 목록, `flux-system` gitrepositories 조회 | BLOCKED |
 | V2 | — | Hanul Kubernetes | `kubectl get pods` | Running 1/1 | — | — | 미실행 |
 | V3 | — | 외부 네트워크 | `curl https://...` | HTTP 200 OK | — | — | 미실행 |
 
@@ -169,7 +169,8 @@ HTTP 200 OK 응답이 반환되고 cert-manager가 발급한 인증서가 확인
 
 | 결과 | 시나리오 | 근거 | 후속 조치 |
 | --- | --- | --- | --- |
-| 미실행 | V1, V2, V3 | 검증 대기 | 사용자 실행 후 증거 수집 |
+| BLOCKED | V1 | `orchid-deploy-key` Secret 미등록으로 Orchid 소스 동기화 실패, `orchid-staging` 미생성 | Garden.Cluster 검증 계획 V2(Deploy Key 등록) 수행 후 V1 재실행 |
+| 미실행 | V2, V3 | V1 게이트 미통과 | V1 통과 후 진행 |
 
 ## 결함 승격
 
