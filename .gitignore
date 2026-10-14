@@ -574,3 +574,6 @@ src/Mobile/Assets/src/wwwroot/peony-mobile-assets.js
 # 26.08.28 [Sisyphus] bash.exe 충돌 stackdump 재발로 패턴을 *.stackdump로 일반화한다.
 *.stackdump
 # #endregion Peony
+
+# 26.10.14 [Claude] OpenBao 파일형 시크릿(SSH 키 등) 로컬 사본. 정본은 OpenBao이다.
+.secrets/
