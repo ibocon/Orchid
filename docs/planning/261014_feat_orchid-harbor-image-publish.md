@@ -556,7 +556,7 @@ Harbor API(`Invoke-HarborApi`), OpenBao(`Get-OpenBaoKvData`·`Set-OpenBaoKvData`
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| 자격 준비 | Step 1 결과로 OpenBao `infra/harbor/orchid-registry-pull`의 auths 호스트와 `gh secret list`의 `HARBOR_*` 3개를 확인한다 | 미확인 |
+| 자격 준비 | Step 1 결과로 OpenBao `infra/harbor/orchid-registry-pull`의 auths 호스트와 `gh secret list`의 `HARBOR_*` 3개를 확인한다 | 확인(2026-10-14 20:43 KST, 스크립트 exit 0): Harbor `orchid`(id 35, 비공개) 생성. `robot$orchid+orchid-pull-flux`(repository.pull), `robot$orchid+ci-push`(repository push·pull, artifact read, tag create), 만료 2027-10-14. OpenBao auths 호스트 `harbor.hanul.botanicsoft.com`, username `robot$orchid+orchid-pull-flux`. GitHub `HARBOR_REGISTRY`·`HARBOR_USERNAME`·`HARBOR_PASSWORD` 등록. registry token에 `repository:orchid/api-gateway:pull` 부여 확인(이미지가 없어 tags/list 404) |
 | workflow 실행 | `Invoke-WorkflowDispatch.ps1`로 `publish-api-gateway-image.yml`, `publish-clipboard-image.yml`을 `main`에서 실행해 성공과 Summary 태그를 확인한다 | 미확인 |
 | pull 자격 동기화 | `orchid-staging/harbor-registry`가 새 key로 `SecretSynced`인지 확인한다 | 미확인 |
 | Pod 기동 | Step 6 푸시 후 Pod 2개 `Running 1/1`, `/health` 200을 확인한다. 앱 시크릿 `PLACEHOLDER` 외 필수 key가 있으면 이 단계에서 드러난다 | 미확인 |
