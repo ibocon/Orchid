@@ -212,7 +212,7 @@ Describe 'Orchid overlay 네임스페이스 규칙' -ForEach @('staging', 'produ
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-production-namespace`가 먼저 반영돼 `orchid-production` 네임스페이스와 ClusterSecretStore 허용이 있어야 한다 | 미충족(2026-10-15, run-autopilot `261015-124010`): 클러스터 네임스페이스 목록에 `orchid-production`이 없고 `lib/Garden.Cluster/docs/planning`·`docs/history`에 Orchid 관련 계획이 없다. 계획 ID `garden-cluster:261014_ops_orchid-production-namespace`는 작성되지 않았다. next gate: Garden.Cluster owner root에 `ops` 계획을 `write-plan`으로 작성해 반영 |
+| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-production-namespace`가 먼저 반영돼 `orchid-production` 네임스페이스와 ClusterSecretStore 허용이 있어야 한다 | 반영 완료, 클러스터 적용 대기(2026-10-15): 계획서는 Peony 저장소 서브모듈 `Peony/lib/Garden.Cluster/docs/planning/261014_ops_orchid-production-namespace.md`에 있다(이전 기록의 "작성되지 않았다"는 Orchid에 없는 `lib/Garden.Cluster`와 오래된 독립 클론만 본 오인). Step 1·2를 구현해 `BotanicSoft/Garden.Cluster` `main@936d39e7`로 푸시했고 Pester 4/4 통과. Flux는 아직 `main@64204922`를 적용 중이라 `orchid-production` 네임스페이스는 미생성이며 `orchid-production-controller`는 `namespaces "orchid-production" not found`로 False. 다음 확인: Flux 반영 후 네임스페이스 생성과 controller READY |
 | Flux 적용 | 두 계획 반영 후 `orchid-production-controller`가 네임스페이스 오류 없이 다음 단계로 넘어가는지 확인한다 | 미확인: 클러스터가 보는 리비전은 `main@a6b80ba`로 이 변경 이전이며 `namespaces "orchid" not found`가 계속된다. 이번 실행은 푸시하지 않아 반영되지 않았다. next gate: 푸시와 위 선행 ops 반영 뒤 `orchid-production-controller` READY 확인 |
 | production 이미지와 시크릿 | 결정 3에 따라 `prod-v1.0.0` 이미지와 `app/prod/orchid/*` 시크릿은 별도 계획에서 다룬다 | 미확인 |
 
