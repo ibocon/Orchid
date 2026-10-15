@@ -1,4 +1,4 @@
-# 🔄 Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축
+# ✅ Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축
 
 ## 계획 관계
 
@@ -9,6 +9,19 @@
 | 관계 | 대상 계획 ID | 조건 | 근거·인수 범위 |
 | --- | --- | --- | --- |
 | 파생 | `orchid:261014_fix_orchid-harbor-image-pull-secret` | 해당 없음 | 후속 검증 "이미지 존재", "경보 해소"를 인수한다. Harbor `orchid` 프로젝트 전용 robot, Dockerfile, GitHub workflow, overlay pull 자격 교체 |
+
+<!-- plan-relations-summary:start -->
+> 자동 생성 관계 요약. 원본은 위 관계 표입니다.
+
+| 구분 | 계획·조건 |
+| --- | --- |
+| 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
+| 직접 출처 | [✅ Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정](<261014_fix_orchid-harbor-image-pull-secret.md>) `orchid:261014_fix_orchid-harbor-image-pull-secret` |
+| 직접 후속 | [✅ Orchid 이미지 Harbor 퍼블리시 workflow 실행과 클러스터 pull 사용자 실행 검증](<261014_verify_orchid-image-publish-and-pull.md>) `orchid:261014_verify_orchid-image-publish-and-pull` |
+| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [✅ Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정](<261014_fix_orchid-harbor-image-pull-secret.md>) `orchid:261014_fix_orchid-harbor-image-pull-secret` → [✅ Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축](<261014_feat_orchid-harbor-image-publish.md>) `orchid:261014_feat_orchid-harbor-image-publish` |
+| 파생 | [✅ Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정](<261014_fix_orchid-harbor-image-pull-secret.md>) `orchid:261014_fix_orchid-harbor-image-pull-secret` — 해당 없음 |
+| 착수 조건 | 가능 |
+<!-- plan-relations-summary:end -->
 
 ## 결정이 필요한 사항
 

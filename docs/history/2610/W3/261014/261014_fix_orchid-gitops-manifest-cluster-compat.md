@@ -16,10 +16,10 @@
 | 구분 | 계획·조건 |
 | --- | --- |
 | 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
-| 직접 출처 | [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../../../../planning/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
+| 직접 출처 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
 | 직접 후속 | 없음 |
-| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../../../../planning/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [✅ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` |
-| 파생 | [⬜ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../../../../planning/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` — 해당 없음 |
+| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [✅ Orchid GitOps 매니페스트가 Hanul 클러스터 API와 맞지 않아 배포가 실패하는 문제 수정](<261014_fix_orchid-gitops-manifest-cluster-compat.md>) `orchid:261014_fix_orchid-gitops-manifest-cluster-compat` |
+| 파생 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` — 해당 없음 |
 | 착수 조건 | 가능 |
 <!-- plan-relations-summary:end -->
 

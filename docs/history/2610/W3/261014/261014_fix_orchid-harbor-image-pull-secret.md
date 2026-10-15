@@ -1,4 +1,4 @@
-# 🔄 Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정
+# ✅ Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정
 
 ## 계획 관계
 
@@ -9,6 +9,19 @@
 | 관계 | 대상 계획 ID | 조건 | 근거·인수 범위 |
 | --- | --- | --- | --- |
 | 파생 | `orchid:261014_verify_orchid-hanul-gitops-deployment` | 해당 없음 | V2 참고 관찰(Harbor `401 Unauthorized`, `imagePullSecrets` 없음)과 Alertmanager `KubePodNotReady`·`KubeDeploymentReplicasMismatch` 경보에서 분리한 작업. Harbor pull secret 배포와 Deployment 참조를 인수한다 |
+
+<!-- plan-relations-summary:start -->
+> 자동 생성 관계 요약. 원본은 위 관계 표입니다.
+
+| 구분 | 계획·조건 |
+| --- | --- |
+| 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
+| 직접 출처 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
+| 직접 후속 | [✅ Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축](<261014_feat_orchid-harbor-image-publish.md>) `orchid:261014_feat_orchid-harbor-image-publish` |
+| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [✅ Orchid staging Pod가 Harbor 이미지 pull 인증 없이 ImagePullBackOff로 기동하지 못하는 문제 수정](<261014_fix_orchid-harbor-image-pull-secret.md>) `orchid:261014_fix_orchid-harbor-image-pull-secret` |
+| 파생 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` — 해당 없음 |
+| 착수 조건 | 가능 |
+<!-- plan-relations-summary:end -->
 
 ## 결정이 필요한 사항
 
@@ -282,7 +295,7 @@ resources:
 | pull secret 동기화 | 푸시 후 `orchid-staging/harbor-registry` ExternalSecret이 `SecretSynced`인지 확인한다 | 확인(2026-10-14, `main@7dc295e`): `SecretSynced` True. 새 ReplicaSet Pod가 `harbor-registry`를 참조한다 |
 | 이미지 존재 | `orchid/api-gateway:stag-dev`, `orchid/clipboard:stag-dev`가 Harbor에 퍼블리시돼 있는지 확인한다 | 별도 결함: pull secret 반영 후에도 `401 Unauthorized`. Peony는 Harbor `garden` 프로젝트(Garden.Cluster 매니페스트 74곳)를 쓰고, Orchid 저장소에는 Harbor 퍼블리시 경로(workflow·스크립트)가 없다. `orchid` 프로젝트 존재·robot 권한·이미지 퍼블리시는 미확인이며 이관: `orchid:261014_feat_orchid-harbor-image-publish` (pull robot이 `garden` 범위이고 `projects/orchid` 403 확인). 확인(2026-10-15): feat 계획으로 `orchid/api-gateway:stag-20261015021051-0a80f65`, `orchid/clipboard:stag-20261015021237-0a80f65` 퍼블리시, 클러스터 pull 성공 |
 | 앱 시크릿 | 결정 3에 따라 사용자가 `app/stag/orchid/api-gateway`, `app/stag/orchid/clipboard`를 등록해야 Pod가 `CreateContainerConfigError` 없이 기동한다 | 확인(2026-10-14 19:15 KST): OpenBao `app/stag/orchid/{api-gateway,clipboard}` 등록(10:12 UTC, key `PLACEHOLDER`만 있음). ExternalSecret 2건 `Ready`. 실제 앱 설정 key는 이미지 기동 후 V2에서 확인 |
-| 경보 해소 | `KubePodNotReady`, `KubeDeploymentReplicasMismatch`가 resolved 되는지 확인한다. 이관: `orchid:261014_feat_orchid-harbor-image-publish` 후속 검증 | 미확인 |
+| 경보 해소 | `KubePodNotReady`, `KubeDeploymentReplicasMismatch`가 resolved 되는지 확인한다. 이관: `orchid:261014_feat_orchid-harbor-image-publish` 후속 검증 | 확인(2026-10-15, run-autopilot `261015-124010`, Prometheus MCP 직접 조회): 두 경보 `ALERTS` 시계열 0건, `orchid-staging` firing 0건, Deployment 2개 `replicas_available` 1, Pod 2개 `1/1 Running`. 근거는 feat 계획 후속 검증과 동일 |
 
 ## 계획 평가
 
@@ -308,3 +321,4 @@ resources:
 3. ✅ Step 2: 두 overlay에 `harbor-registry` ExternalSecret을 추가한다.
 4. ✅ Pester와 `Test-KustomizationBuild.ps1`을 통과시킨다.
 5. ✅ 푸시 후 `harbor-registry` 동기화를 확인했다. 이미지 pull은 이미지 퍼블리시 결함으로 막혀 있어 `orchid:261014_verify_orchid-hanul-gitops-deployment` V2로 이관한다.
+6. ✅ feat 계획으로 이미지가 퍼블리시돼 Pod가 기동했고 경보 해소를 Prometheus로 확인했다(`이미지 존재`, `경보 해소` 행 확인).

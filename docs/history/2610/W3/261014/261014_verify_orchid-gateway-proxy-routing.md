@@ -1,4 +1,4 @@
-# ⬜ Orchid api-gateway 프록시와 실시간 허브 경로 사용자 실행 검증
+# ✅ Orchid api-gateway 프록시와 실시간 허브 경로 사용자 실행 검증
 
 ## 계획 관계
 
@@ -12,13 +12,24 @@
 | 실행 의존 | `orchid:261014_verify_orchid-image-publish-and-pull` | `verification-pass:V3` | 이미지가 푸시되고 Pod가 pull해야 gateway와 clipboard가 기동해 프록시를 확인할 수 있다 |
 
 <!-- plan-relations-summary:start -->
+> 자동 생성 관계 요약. 원본은 위 관계 표입니다.
+
+| 구분 | 계획·조건 |
+| --- | --- |
+| 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
+| 직접 출처 | [✅ Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정](<261014_fix_orchid-configmap-not-mounted.md>) `orchid:261014_fix_orchid-configmap-not-mounted` |
+| 직접 후속 | 없음 |
+| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [✅ Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정](<261014_fix_orchid-configmap-not-mounted.md>) `orchid:261014_fix_orchid-configmap-not-mounted` → [✅ Orchid api-gateway 프록시와 실시간 허브 경로 사용자 실행 검증](<261014_verify_orchid-gateway-proxy-routing.md>) `orchid:261014_verify_orchid-gateway-proxy-routing` |
+| 검증 대상 | [✅ Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정](<261014_fix_orchid-configmap-not-mounted.md>) `orchid:261014_fix_orchid-configmap-not-mounted` — 해당 없음 |
+| 실행 의존 | [✅ Orchid 이미지 Harbor 퍼블리시 workflow 실행과 클러스터 pull 사용자 실행 검증](<261014_verify_orchid-image-publish-and-pull.md>) `orchid:261014_verify_orchid-image-publish-and-pull` — verification-pass:V3 |
+| 착수 조건 | 가능 |
 <!-- plan-relations-summary:end -->
 
 ## 선행 계획
 
 | 계획 | 계획 ID | 완료 상태 | 이관한 후속 검증 |
 | --- | --- | --- | --- |
-| [Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정](261014_fix_orchid-configmap-not-mounted.md) | `orchid:261014_fix_orchid-configmap-not-mounted` | ⬜ | 이미지 전제, 프록시 동작 |
+| [Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정](261014_fix_orchid-configmap-not-mounted.md) | `orchid:261014_fix_orchid-configmap-not-mounted` | ✅ | 이미지 전제, 프록시 동작 |
 
 ## 배경
 
@@ -52,9 +63,9 @@ kubectl get namespaces
 
 | 항목 | 확인 방법 | 기대값 | 상태 |
 | --- | --- | --- | --- |
-| 이미지 pull 검증 | `orchid:261014_verify_orchid-image-publish-and-pull` V3 | `PASS` | 미충족 |
-| 선행 fix 구현 | `docs/planning/261014_fix_orchid-configmap-not-mounted.md` H1 | `✅` | 미충족 |
-| 앱 시크릿 동기화 | `kubectl get externalsecrets -n orchid-staging` | `SecretSynced` | 미충족 |
+| 이미지 pull 검증 | `orchid:261014_verify_orchid-image-publish-and-pull` V3 | `PASS` | 충족(2026-10-15, run-autopilot `261015-124010`): 해당 계획 V3 `PASS` |
+| 선행 fix 구현 | `docs/history/2610/W3/261014/261014_fix_orchid-configmap-not-mounted.md` H1 | `✅` | 충족(아카이브됨) |
+| 앱 시크릿 동기화 | `kubectl get externalsecrets -n orchid-staging` | `SecretSynced` | 충족(2026-10-15): `harbor-registry`, `orchid-api-gateway-external-secret`, `orchid-clipboard-external-secret` 모두 `SecretSynced` True |
 
 ## 사용자 실행 절차
 
@@ -164,9 +175,9 @@ V2가 통과하기 전에는 V3를 안내하지 않는다.
 
 | ID | 실행 시각 | 환경과 릴리스 | 입력 | 기대 결과 | 실제 결과 | 증거 | 판정 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V1 | — | Hanul Kubernetes | `kubectl get pods`와 `kubectl exec` | Ready, 설정 파일 확인 | — | — | 미실행 |
-| V2 | — | 외부 네트워크 | `POST /api/clipboard/push` | 200 또는 400 | — | — | 미실행 |
-| V3 | — | 외부 네트워크 | `POST /hubs/clipboard/negotiate` | `WebSockets` 전송 포함 | — | — | 미실행 |
+| V1 | 2026-10-15 (Kubernetes API 조회) | Hanul Kubernetes `orchid-staging`, 이미지 `stag-20261015021051-0a80f65` | Kubernetes API로 Pod·ConfigMap 조회. 이 환경의 셸 kubectl에는 kubeconfig가 없고 MCP에 exec 도구가 없어 `kubectl exec grep`을 대체함 | Ready, 설정 파일 확인 | 두 Pod `Running`, `ready true`, `restartCount 0`. 두 컨테이너 모두 `/app/appsettings.json`을 `app-settings` ConfigMap `subPath` 읽기 전용으로 마운트. ConfigMap `orchid-api-gateway-config-map`의 `appsettings.json`에 `"Address": "http://orchid-clipboard-service:8080"` 포함 | Pod `volumeMounts`·`containerStatuses`와 ConfigMap `data` 응답. ConfigMap `subPath` 마운트는 키가 없으면 컨테이너가 기동하지 않으므로 Ready Pod는 파일 존재를 함께 입증한다. 파일 내용 직접 출력(exec)이 아니라 ConfigMap 원본 대조라는 점이 계획과 다르다 | PASS |
+| V2 | 2026-10-15T04:00:17Z | 외부 네트워크 | `curl -X POST -H "Content-Type: application/json" -d "{}" https://orchid.stag.botanicsoft.com/api/clipboard/push` | 200 또는 400 | HTTP `400` | 상태 코드 `400` 한 줄. 502·503·504가 아니므로 gateway가 clipboard에 도달해 입력 검증 응답을 받았다 | `curl -w "%{http_code}"` 출력 | PASS |
+| V3 | 2026-10-15 (V2 직후) | 외부 네트워크 | `curl -X POST "https://orchid.stag.botanicsoft.com/hubs/clipboard/negotiate?negotiateVersion=1"` | `WebSockets` 전송 포함 | 응답 `availableTransports`에 `WebSockets`(Text·Binary), `ServerSentEvents`, `LongPolling` 포함. `connectionId`·`connectionToken`은 제거 | 응답 JSON의 `availableTransports` 배열 | PASS |
 
 증거에는 `connectionId`와 비밀값을 제거한다.
 
@@ -174,7 +185,7 @@ V2가 통과하기 전에는 V3를 안내하지 않는다.
 
 | 결과 | 시나리오 | 근거 | 후속 조치 |
 | --- | --- | --- | --- |
-| 미실행 | V1, V2, V3 | 이미지 pull 검증과 선행 fix 구현 대기 | 선행 조건 충족 후 사용자 실행 |
+| PASS | V1, V2, V3 | Pod 2개 Ready와 ConfigMap 설정 파일 마운트, gateway 경유 `POST /api/clipboard/push` 400(5xx 아님), SignalR negotiate의 WebSockets 전송 제안. 에이전트가 증거를 통과 기준과 대조해 판정했다(run-autopilot `261015-124010`). V1 확인 방법은 exec 도구 부재로 ConfigMap 원본 대조로 대체했다 | 없음 |
 
 ## 결함 승격
 
@@ -184,7 +195,7 @@ V2가 통과하기 전에는 V3를 안내하지 않는다.
 
 ## 작업 순서
 
-1. 사전 조건을 확인한다.
-2. V1을 안내하고 증거를 수집한다.
-3. V2와 V3를 순차적으로 진행한다.
-4. 모든 시나리오 결과를 기록하고 완료한다.
+1. ✅ 사전 조건을 확인한다.
+2. ✅ V1 증거를 수집한다.
+3. ✅ V2와 V3를 순차적으로 진행한다.
+4. ✅ 모든 시나리오 결과를 기록하고 완료한다.

@@ -1,4 +1,4 @@
-# 🔄 Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정
+# ✅ Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정
 
 ## 계획 관계
 
@@ -11,6 +11,16 @@
 | 파생 | `orchid:261014_verify_orchid-hanul-gitops-deployment` | 해당 없음 | 이미지 pull 조사 중 발견한 설정 미적용 결함에서 분리한 작업. ConfigMap `appsettings.json`을 컨테이너 설정 파일로 적용하는 수정을 인수한다 |
 
 <!-- plan-relations-summary:start -->
+> 자동 생성 관계 요약. 원본은 위 관계 표입니다.
+
+| 구분 | 계획·조건 |
+| --- | --- |
+| 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
+| 직접 출처 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
+| 직접 후속 | [✅ Orchid api-gateway 프록시와 실시간 허브 경로 사용자 실행 검증](<261014_verify_orchid-gateway-proxy-routing.md>) `orchid:261014_verify_orchid-gateway-proxy-routing` |
+| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [✅ Orchid ConfigMap의 appsettings.json이 컨테이너에 적용되지 않아 gateway 프록시가 동작하지 않는 문제 수정](<261014_fix_orchid-configmap-not-mounted.md>) `orchid:261014_fix_orchid-configmap-not-mounted` |
+| 파생 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` — 해당 없음 |
+| 착수 조건 | 가능 |
 <!-- plan-relations-summary:end -->
 
 ## 결정이 필요한 사항
@@ -278,8 +288,8 @@ Describe 'Orchid ConfigMap 설정 파일 마운트' -ForEach @('staging', 'produ
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| 이미지 전제 | 마운트 경로 `/app/appsettings.json`이 실제 이미지의 `WORKDIR`와 맞는지 확인한다. 이미지는 `orchid:261014_feat_orchid-harbor-image-publish`에서 만들어진다 | 미확인 |
-| 프록시 동작 | Pod가 기동한 뒤 gateway가 `/api/clipboard`를 clipboard 서비스로 프록시하는지 확인한다. 이미지와 클러스터가 필요해 사용자 실행 검증(`verify`)으로 분리한다 | 미확인 |
+| 이미지 전제 | 마운트 경로 `/app/appsettings.json`이 실제 이미지의 `WORKDIR`와 맞는지 확인한다. 이미지는 `orchid:261014_feat_orchid-harbor-image-publish`에서 만들어진다 | 확인(2026-10-15, run-autopilot `261015-124010`): 두 Dockerfile 런타임 단계가 `WORKDIR /app`이다. 클러스터 `orchid-api-gateway` Deployment(revision 4, 이미지 `stag-20261015021051-0a80f65`)에 `/app/appsettings.json` `subPath` 읽기 전용 마운트가 반영돼 있고 `readyReplicas` 1이다. `Invoke-Pester test/Deploy` 21건 통과 |
+| 프록시 동작 | Pod가 기동한 뒤 gateway가 `/api/clipboard`를 clipboard 서비스로 프록시하는지 확인한다. 이미지와 클러스터가 필요해 사용자 실행 검증(`verify`)으로 분리한다 | 이관: [verify 계획](../../../../planning/261014_verify_orchid-gateway-proxy-routing.md) V1·V2. 이 계획의 코드 변경 범위는 닫는다 |
 
 ## 계획 평가
 
@@ -306,4 +316,4 @@ Describe 'Orchid ConfigMap 설정 파일 마운트' -ForEach @('staging', 'produ
 2. ✅ Step 1: api-gateway Deployment를 수정한다.
 3. ✅ Step 2: clipboard Deployment를 수정한다.
 4. ✅ Pester와 `Test-KustomizationBuild.ps1`을 통과시킨다.
-5. 이미지 퍼블리시 계획이 끝나 Pod가 기동하면 프록시 동작을 사용자 실행 검증으로 확인한다.
+5. ✅ 이미지 퍼블리시 계획이 끝나 Pod가 기동했다. 프록시 동작은 verify 계획 `261014_verify_orchid-gateway-proxy-routing` 으로 이관했다.
