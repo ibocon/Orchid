@@ -8,6 +8,6 @@ resources:
   - ingress.yaml
 images:
   - name: harbor.hanul.botanicsoft.com/orchid/api-gateway
-    newTag: prod-v1.0.0
+    digest: sha256:d9b3fdead6c81bfa2270ddf3b070712a39956b1830d74d4a08d590cad8f5d461
   - name: harbor.hanul.botanicsoft.com/orchid/clipboard
-    newTag: prod-v1.0.0
+    digest: sha256:c136fd32ee4b4cad8cff996a61d35d0bb7120c7cfa3d027cbaf8eeb58a6d699d

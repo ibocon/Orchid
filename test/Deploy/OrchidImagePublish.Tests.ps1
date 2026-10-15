@@ -81,4 +81,19 @@ Describe 'Orchid 이미지 퍼블리시 경로' {
         $Tags | Should -Not -Contain 'stag-dev'
         $Tags | ForEach-Object { $_ | Should -Match '^stag-\d{14}-[0-9a-f]{7}$' }
     }
+
+    It 'Given production overlay, When 렌더링, Then 두 서비스가 immutable digest 를 사용한다' {
+        # Given
+        $Manifest = Get-RenderedManifest -Overlay 'production'
+
+        # When
+        $Digests = [regex]::Matches(
+            $Manifest,
+            'image: harbor\.hanul\.botanicsoft\.com/orchid/[^@]+@(sha256:[0-9a-f]{64})') |
+            ForEach-Object { $_.Groups[1].Value }
+
+        # Then
+        $Digests | Should -HaveCount 2
+        $Digests | Should -Not -Contain 'sha256:prod-v1.0.0'
+    }
 }
