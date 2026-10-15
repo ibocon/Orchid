@@ -280,7 +280,7 @@ resources:
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
 | pull secret 동기화 | 푸시 후 `orchid-staging/harbor-registry` ExternalSecret이 `SecretSynced`인지 확인한다 | 확인(2026-10-14, `main@7dc295e`): `SecretSynced` True. 새 ReplicaSet Pod가 `harbor-registry`를 참조한다 |
-| 이미지 존재 | `orchid/api-gateway:stag-dev`, `orchid/clipboard:stag-dev`가 Harbor에 퍼블리시돼 있는지 확인한다 | 별도 결함: pull secret 반영 후에도 `401 Unauthorized`. Peony는 Harbor `garden` 프로젝트(Garden.Cluster 매니페스트 74곳)를 쓰고, Orchid 저장소에는 Harbor 퍼블리시 경로(workflow·스크립트)가 없다. `orchid` 프로젝트 존재·robot 권한·이미지 퍼블리시는 미확인이며 이관: `orchid:261014_feat_orchid-harbor-image-publish` (pull robot이 `garden` 범위이고 `projects/orchid` 403 확인) |
+| 이미지 존재 | `orchid/api-gateway:stag-dev`, `orchid/clipboard:stag-dev`가 Harbor에 퍼블리시돼 있는지 확인한다 | 별도 결함: pull secret 반영 후에도 `401 Unauthorized`. Peony는 Harbor `garden` 프로젝트(Garden.Cluster 매니페스트 74곳)를 쓰고, Orchid 저장소에는 Harbor 퍼블리시 경로(workflow·스크립트)가 없다. `orchid` 프로젝트 존재·robot 권한·이미지 퍼블리시는 미확인이며 이관: `orchid:261014_feat_orchid-harbor-image-publish` (pull robot이 `garden` 범위이고 `projects/orchid` 403 확인). 확인(2026-10-15): feat 계획으로 `orchid/api-gateway:stag-20261015021051-0a80f65`, `orchid/clipboard:stag-20261015021237-0a80f65` 퍼블리시, 클러스터 pull 성공 |
 | 앱 시크릿 | 결정 3에 따라 사용자가 `app/stag/orchid/api-gateway`, `app/stag/orchid/clipboard`를 등록해야 Pod가 `CreateContainerConfigError` 없이 기동한다 | 확인(2026-10-14 19:15 KST): OpenBao `app/stag/orchid/{api-gateway,clipboard}` 등록(10:12 UTC, key `PLACEHOLDER`만 있음). ExternalSecret 2건 `Ready`. 실제 앱 설정 key는 이미지 기동 후 V2에서 확인 |
 | 경보 해소 | `KubePodNotReady`, `KubeDeploymentReplicasMismatch`가 resolved 되는지 확인한다. 이관: `orchid:261014_feat_orchid-harbor-image-publish` 후속 검증 | 미확인 |
 

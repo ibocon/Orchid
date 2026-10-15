@@ -1,4 +1,4 @@
-# ⬜ Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축
+# 🔄 Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축
 
 ## 계획 관계
 
@@ -560,8 +560,8 @@ Harbor API(`Invoke-HarborApi`), OpenBao(`Get-OpenBaoKvData`·`Set-OpenBaoKvData`
 | 자격 준비 | Step 1 결과로 OpenBao `infra/harbor/orchid-registry-pull`의 auths 호스트와 `gh secret list`의 `HARBOR_*` 3개를 확인한다 | 확인(2026-10-14 20:43 KST, 스크립트 exit 0): Harbor `orchid`(id 35, 비공개) 생성. `robot$orchid+orchid-pull-flux`(repository.pull), `robot$orchid+ci-push`(repository push·pull, artifact read, tag create), 만료 2027-10-14. OpenBao auths 호스트 `harbor.hanul.botanicsoft.com`, username `robot$orchid+orchid-pull-flux`. GitHub `HARBOR_REGISTRY`·`HARBOR_USERNAME`·`HARBOR_PASSWORD` 등록. registry token에 `repository:orchid/api-gateway:pull` 부여 확인(이미지가 없어 tags/list 404) |
 | workflow 실행 | `Invoke-WorkflowDispatch.ps1`로 `publish-api-gateway-image.yml`, `publish-clipboard-image.yml`을 `main`에서 실행해 성공과 Summary 태그를 확인한다 | 확인(2026-10-15, `main@0a80f65`): run `38669605760`(api-gateway) success, `stag-20261015021051-0a80f65`. run `38669763685`(clipboard) success, `stag-20261015021237-0a80f65`. pull robot 토큰으로 Harbor `tags/list` 조회 시 두 저장소에 `sha-0a80f65`와 stag 태그가 있다 |
 | pull 자격 동기화 | `orchid-staging/harbor-registry`가 새 key로 `SecretSynced`인지 확인한다 | 확인(2026-10-15, `main@0a80f65`): generation 2, `remoteRef.key: infra/harbor/orchid-registry-pull`, `SecretSynced` True |
-| Pod 기동 | Step 6 푸시 후 Pod 2개 `Running 1/1`, `/health` 200을 확인한다. 앱 시크릿 `PLACEHOLDER` 외 필수 key가 있으면 이 단계에서 드러난다 | 미확인 |
-| 경보 해소 | `KubePodNotReady`, `KubeDeploymentReplicasMismatch`가 resolved 되는지 Prometheus `ALERTS`로 확인한다. 확인 후 `orchid:261014_fix_orchid-harbor-image-pull-secret`의 "이미지 존재", "경보 해소"를 함께 닫는다 | 미확인 |
+| Pod 기동 | Step 6 푸시 후 Pod 2개 `Running 1/1`, `/health` 200을 확인한다. 앱 시크릿 `PLACEHOLDER` 외 필수 key가 있으면 이 단계에서 드러난다 | 확인(2026-10-15, `main@22ec993`): `orchid-staging-controller` READY True. 이벤트 `Successfully pulled image .../orchid/api-gateway:stag-20261015021051-0a80f65`, `.../orchid/clipboard:stag-20261015021237-0a80f65`. Deployment 2개 `1/1`, 이전 ReplicaSet Pod 제거. 두 컨테이너 로그 `Now listening on: http://[::]:8080`, 시작 오류 없음. 공인 `https://orchid.stag.botanicsoft.com/health` → 200 `{"status":"Healthy","service":"Orchid.ApiGateway"}` |
+| 경보 해소 | `KubePodNotReady`, `KubeDeploymentReplicasMismatch`가 resolved 되는지 Prometheus `ALERTS`로 확인한다. 확인 후 `orchid:261014_fix_orchid-harbor-image-pull-secret`의 "이미지 존재", "경보 해소"를 함께 닫는다 | 미확인: 발화 조건(Deployment replicas 불일치, Pod NotReady)은 해소됐다. `ALERTS` 직접 조회는 Prometheus MCP(`lazy handshake` 실패)와 port-forward 실패로 하지 못했다. Prometheus 또는 Alertmanager resolved 알림으로 확인한다 |
 | production | production은 `namespaces "orchid" not found`로 아직 적용되지 않는다. 태그 승격은 `promote-environment` 범위 | 범위 밖 |
 
 ## 계획 평가
