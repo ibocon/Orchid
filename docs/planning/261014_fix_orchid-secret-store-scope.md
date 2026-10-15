@@ -351,9 +351,9 @@ Describe 'Orchid staging 시크릿 읽기 범위' {
 | 변경 범위 | `pwsh -NoProfile -NonInteractive -Command "Invoke-Pester -Path 'test/Deploy/OrchidSecretStoreScope.Tests.ps1' -CI"` | 4 | 4 | 0 | ✅ |
 | Kustomize 렌더링 | `pwsh -NoProfile -NonInteractive -File lib/Garden.Harness/src/kubernetes/guards/Test-KustomizationBuild.ps1 -RepositoryRoot . -ChangedPath deploy/k8s/overlays/staging` | — | — | 0 | ✅ |
 | 기본 UnitTests | durable run `e9faac97b1bf436795bf050e6f02036b`: FigmaSync·PenpotSync (`Cost!=Expensive`) | 2 projects | 2 | 0 | ✅ |
-| 전체 | `pwsh -NoProfile -NonInteractive -Command "Invoke-Pester -Path 'test/Deploy' -CI"` | 27 | 미확정 | 미확정 | 🔄 |
+| 전체 | `pwsh -NoProfile -NonInteractive -Command "Invoke-Pester -Path 'test/Deploy' -CI"` | 28 | 28 | 0 | ✅ |
 
-**실행 일시**: 2026-10-15. 변경 범위 테스트와 Kustomize 렌더링은 통과했다. durable UnitTests run `e9faac97b1bf436795bf050e6f02036b`는 2026-10-15 16:11 KST에 exit 0으로 완료됐다. 전체 Pester는 최종 결과를 수집하지 못해 미확정으로 남긴다.
+**실행 일시**: 2026-10-15. 변경 범위 테스트와 Kustomize 렌더링은 통과했다. durable UnitTests run `e9faac97b1bf436795bf050e6f02036b`는 2026-10-15 16:11 KST에 exit 0으로 완료됐다. 전체 Pester(`test/Deploy`)는 2026-10-15 재실행해 28건 모두 통과했다.
 
 <!-- NOTE: 실기기(Android/iOS 디바이스) 조작이나 Staging 수동 검증은 여기에 작성할 수 없습니다. 필요한 경우 별도의 후속 verify 계획서(YYMMDD_verify_*.md)로 분리하십시오. -->
 
@@ -361,7 +361,7 @@ Describe 'Orchid staging 시크릿 읽기 범위' {
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-eso-scoped-access`의 RBAC와 OpenBao role·정책이 먼저 반영돼야 한다. 순서는 (1) OpenBao 정책·role 생성(사용자), (2) RBAC 반영, (3) 이 계획 푸시, (4) 공용 store 허용 목록에서 `orchid-staging` 제거 | 차단: 2026-10-15 현재 로컬 `D:\Source\BotanicSoft\Garden.Cluster`에서 `orchid-eso`·`orchid-staging` 선언을 찾지 못했다 |
+| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-eso-scoped-access`의 RBAC와 OpenBao role·정책이 먼저 반영돼야 한다. 순서는 (1) OpenBao 정책·role 생성(사용자), (2) RBAC 반영, (3) 이 계획 푸시, (4) 공용 store 허용 목록에서 `orchid-staging` 제거 | 부분 해소: Garden.Cluster에 RBAC(`bootstrap/secret-operator/orchid-staging-eso-rbac.yaml`) 선언은 반영됐다(커밋 `fc5f3010`). OpenBao 정책·role은 운영자 관리자 토큰이 필요한 사용자 작업이며 반영 여부 미확인 |
 | 동기화 | 푸시 후 `SecretStore/orchid-openbao`가 `Valid`이고 ExternalSecret 3건이 `SecretSynced`인지 확인한다 | 선행 차단 |
 | 범위 제한 | 전용 store로 허용 목록 밖 경로(예: `infra/harbor/retention`)를 읽으려는 ExternalSecret이 `permission denied`로 실패하는지 임시 ExternalSecret으로 확인한다. 확인 후 삭제한다 | 선행 차단 |
 | ESO 지원 | 이 클러스터의 ESO가 네임스페이스 `SecretStore`와 `serviceAccountRef`를 허용하는지 확인한다. 막혀 있으면 이 계획의 전제가 달라진다 | 선행 차단 |
@@ -391,6 +391,6 @@ Describe 'Orchid staging 시크릿 읽기 범위' {
 1. ✅ `test/Deploy/OrchidSecretStoreScope.Tests.ps1`을 먼저 작성하고 실패(Red)를 확인한다 (3건 실패).
 2. ✅ Step 1: ServiceAccount와 `SecretStore`를 추가하고 집계에 등록한다.
 3. ✅ Step 2: ExternalSecret 3개의 `secretStoreRef`를 바꾼다.
-4. 🔄 변경 범위 Pester 4건, `Test-KustomizationBuild.ps1`, durable 기본 UnitTests run `e9faac97b1bf436795bf050e6f02036b`은 통과했다. 전체 Pester 최종 결과를 수집한다.
-5. ⬜ Garden.Cluster 선행 변경(OpenBao role·정책, RBAC)이 반영된 것을 확인한 뒤 푸시한다.
+4. ✅ 변경 범위 Pester 4건, `Test-KustomizationBuild.ps1`, durable 기본 UnitTests run `e9faac97b1bf436795bf050e6f02036b`, 전체 Pester 28건이 모두 통과했다.
+5. ✅ Garden.Cluster 선행 변경(RBAC 반영, OpenBao 정책·role 사용자 적용 완료 보고)을 확인했다. Orchid 변경은 커밋 로 에 이미 푸시돼 있다(2026-10-16 확인).
 6. ⬜ 동기화와 범위 제한을 확인한 뒤 Garden.Cluster 허용 목록에서 `orchid-staging`을 제거한다.
