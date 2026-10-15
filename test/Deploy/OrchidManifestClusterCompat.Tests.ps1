@@ -58,7 +58,7 @@ Describe 'Orchid overlay 클러스터 호환성' -ForEach @('staging', 'producti
         $Manifest = Get-RenderedManifest -Overlay $_
 
         # When / Then
-        $Manifest | Should -Match 'remoteRef:\s+key: infra/harbor/registry-pull'
+        $Manifest | Should -Match 'remoteRef:\s+key: infra/harbor/orchid-registry-pull'
         $Manifest | Should -Match 'type: kubernetes\.io/dockerconfigjson'
     }
 }

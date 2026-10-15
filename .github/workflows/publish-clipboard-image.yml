@@ -1,0 +1,61 @@
+name: publish-clipboard-image
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to build (branch, tag, or full SHA). Defaults to the dispatch ref.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-clipboard-${{ github.event.inputs.ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: publish clipboard
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHORT_SHA="$(git rev-parse --short=7 HEAD)"
+          BUILD_STAMP="$(date -u +%Y%m%d%H%M%S)"
+          IMAGE="${{ secrets.HARBOR_REGISTRY }}/orchid/clipboard"
+          echo "tags=${IMAGE}:sha-${SHORT_SHA},${IMAGE}:stag-${BUILD_STAMP}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "stag-tag=stag-${BUILD_STAMP}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Login to Harbor
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ secrets.HARBOR_REGISTRY }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: src/Service/Clipboard/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=clipboard
+          cache-to: type=gha,scope=clipboard,mode=min,ignore-error=true
+          provenance: false
+
+      - name: Summary
+        run: echo "Published staging tag ${{ steps.tags.outputs.stag-tag }}" >> "$GITHUB_STEP_SUMMARY"

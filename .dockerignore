@@ -1,0 +1,10 @@
+# 빌드 컨텍스트에서 산출물·비밀·서브모듈 제외
+**/bin/
+**/obj/
+.git/
+.env
+.env.*
+.secrets/
+lib/
+docs/
+**/test/
