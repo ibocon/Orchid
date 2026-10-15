@@ -56,6 +56,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/lib/Garden.Harness/src/agents/scripts/Invoke-HookCommand.ps1\" -Target lib/Garden.Harness/src/agents/guards/Test-CommandTimeoutGuard.ps1",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PostToolUse": [
