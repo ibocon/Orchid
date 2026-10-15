@@ -392,5 +392,5 @@ Describe 'Orchid staging 시크릿 읽기 범위' {
 2. ✅ Step 1: ServiceAccount와 `SecretStore`를 추가하고 집계에 등록한다.
 3. ✅ Step 2: ExternalSecret 3개의 `secretStoreRef`를 바꾼다.
 4. ✅ 변경 범위 Pester 4건, `Test-KustomizationBuild.ps1`, durable 기본 UnitTests run `e9faac97b1bf436795bf050e6f02036b`, 전체 Pester 28건이 모두 통과했다.
-5. ✅ Garden.Cluster 선행 변경(RBAC 반영, OpenBao 정책·role 사용자 적용 완료 보고)을 확인했다. Orchid 변경은 커밋 로 에 이미 푸시돼 있다(2026-10-16 확인).
+5. ✅ Garden.Cluster 선행 변경(RBAC 반영, OpenBao 정책·role 사용자 적용 완료 보고)을 확인했다. Orchid 변경은 커밋 `9be8c8e`로 `origin/main`에 이미 푸시돼 있다(2026-10-16 확인).
 6. ⬜ 동기화와 범위 제한을 확인한 뒤 Garden.Cluster 허용 목록에서 `orchid-staging`을 제거한다.
