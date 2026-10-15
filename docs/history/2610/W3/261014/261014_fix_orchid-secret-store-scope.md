@@ -1,4 +1,4 @@
-# ⬜ Orchid ExternalSecret이 공용 ClusterSecretStore로 OpenBao 전체를 읽을 수 있는 과권한 수정
+# ✅ Orchid ExternalSecret이 공용 ClusterSecretStore로 OpenBao 전체를 읽을 수 있는 과권한 수정
 
 ## 계획 관계
 
@@ -16,11 +16,11 @@
 
 | 구분 | 계획·조건 |
 | --- | --- |
-| 최초 계획 | [⬜ Orchid ExternalSecret이 공용 ClusterSecretStore로 OpenBao 전체를 읽을 수 있는 과권한 수정](<261014_fix_orchid-secret-store-scope.md>) `orchid:261014_fix_orchid-secret-store-scope` |
+| 최초 계획 | [✅ Orchid ExternalSecret이 공용 ClusterSecretStore로 OpenBao 전체를 읽을 수 있는 과권한 수정](<261014_fix_orchid-secret-store-scope.md>) `orchid:261014_fix_orchid-secret-store-scope` |
 | 직접 출처 | 없음 |
 | 직접 후속 | 없음 |
-| 계보 경로 | [⬜ Orchid ExternalSecret이 공용 ClusterSecretStore로 OpenBao 전체를 읽을 수 있는 과권한 수정](<261014_fix_orchid-secret-store-scope.md>) `orchid:261014_fix_orchid-secret-store-scope` |
-| 실행 의존 | [✅ Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축](<../history/2610/W3/261014/261014_feat_orchid-harbor-image-publish.md>) `orchid:261014_feat_orchid-harbor-image-publish` — plan-complete |
+| 계보 경로 | [✅ Orchid ExternalSecret이 공용 ClusterSecretStore로 OpenBao 전체를 읽을 수 있는 과권한 수정](<261014_fix_orchid-secret-store-scope.md>) `orchid:261014_fix_orchid-secret-store-scope` |
+| 실행 의존 | [✅ Orchid 서비스 이미지를 Harbor orchid 프로젝트로 퍼블리시하는 경로 구축](<261014_feat_orchid-harbor-image-publish.md>) `orchid:261014_feat_orchid-harbor-image-publish` — plan-complete |
 | 착수 조건 | 가능 |
 <!-- plan-relations-summary:end -->
 
@@ -361,9 +361,9 @@ Describe 'Orchid staging 시크릿 읽기 범위' {
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-eso-scoped-access`의 RBAC와 OpenBao role·정책이 먼저 반영돼야 한다. 순서는 (1) OpenBao 정책·role 생성(사용자), (2) RBAC 반영, (3) 이 계획 푸시, (4) 공용 store 허용 목록에서 `orchid-staging` 제거 | 부분 해소: Garden.Cluster에 RBAC(`bootstrap/secret-operator/orchid-staging-eso-rbac.yaml`) 선언은 반영됐다(커밋 `fc5f3010`). OpenBao 정책·role은 운영자 관리자 토큰이 필요한 사용자 작업이며 반영 여부 미확인 |
-| 동기화 | 푸시 후 `SecretStore/orchid-openbao`가 `Valid`이고 ExternalSecret 3건이 `SecretSynced`인지 확인한다 | 선행 차단 |
-| 범위 제한 | 전용 store로 허용 목록 밖 경로(예: `infra/harbor/retention`)를 읽으려는 ExternalSecret이 `permission denied`로 실패하는지 임시 ExternalSecret으로 확인한다. 확인 후 삭제한다 | 선행 차단 |
+| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-eso-scoped-access`의 RBAC와 OpenBao role·정책이 먼저 반영돼야 한다 | 확인: RBAC·OpenBao 정책·role 적용 및 공용 store 허용 목록 제거가 완료됐다 |
+| 동기화 | 푸시 후 `SecretStore/orchid-openbao`가 `Valid`이고 ExternalSecret 3건이 `SecretSynced`인지 확인한다 | 확인(2026-10-16): store Valid, `harbor-registry`, `orchid-api-gateway-external-secret`, `orchid-clipboard-external-secret` 모두 SecretSynced |
+| 범위 제한 | 전용 store로 허용 목록 밖 경로를 읽으려는 ExternalSecret이 `permission denied`로 실패하는지 확인한다 | 확인: 임시 probe가 `infra/harbor/retention` 요청에서 OpenBao 403 permission denied를 받고 삭제됐으며 대상 Secret도 없다 |
 | ESO 지원 | 이 클러스터의 ESO가 네임스페이스 `SecretStore`와 `serviceAccountRef`를 허용하는지 확인한다. 막혀 있으면 이 계획의 전제가 달라진다 | 선행 차단 |
 
 ## 계획 평가
@@ -393,4 +393,4 @@ Describe 'Orchid staging 시크릿 읽기 범위' {
 3. ✅ Step 2: ExternalSecret 3개의 `secretStoreRef`를 바꾼다.
 4. ✅ 변경 범위 Pester 4건, `Test-KustomizationBuild.ps1`, durable 기본 UnitTests run `e9faac97b1bf436795bf050e6f02036b`, 전체 Pester 28건이 모두 통과했다.
 5. ✅ Garden.Cluster 선행 변경(RBAC 반영, OpenBao 정책·role 사용자 적용 완료 보고)을 확인했다. Orchid 변경은 커밋 `9be8c8e`로 `origin/main`에 이미 푸시돼 있다(2026-10-16 확인).
-6. ⬜ 동기화와 범위 제한을 확인한 뒤 Garden.Cluster 허용 목록에서 `orchid-staging`을 제거한다.
+6. ✅ 동기화와 범위 제한을 확인한 뒤 Garden.Cluster 허용 목록에서 `orchid-staging`을 제거했다. Flux `platform-secret-distribution-controller`가 `main@7f619401`으로 Ready=True이며 live 허용 목록에도 해당 namespace가 없다.
