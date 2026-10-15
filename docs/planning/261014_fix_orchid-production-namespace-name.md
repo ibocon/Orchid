@@ -1,4 +1,4 @@
-# ⬜ Orchid production overlay 네임스페이스가 클러스터에 없고 staging 이름 규칙과 달라 적용되지 않는 문제 수정
+# 🔄 Orchid production overlay 네임스페이스가 클러스터에 없고 staging 이름 규칙과 달라 적용되지 않는 문제 수정
 
 ## 계획 관계
 
@@ -11,6 +11,16 @@
 | 파생 | `orchid:261014_verify_orchid-hanul-gitops-deployment` | 해당 없음 | 검증 중 관찰한 `orchid-production-controller`의 `namespaces "orchid" not found`에서 분리한 작업. production overlay 네임스페이스 이름 정리를 인수한다 |
 
 <!-- plan-relations-summary:start -->
+> 자동 생성 관계 요약. 원본은 위 관계 표입니다.
+
+| 구분 | 계획·조건 |
+| --- | --- |
+| 최초 계획 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` |
+| 직접 출처 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../history/2610/W3/261014/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` |
+| 직접 후속 | 없음 |
+| 계보 경로 | [✅ Orchid 서비스 독립 GitOps 배포 매니페스트 구축 및 Hanul 온보딩 계획](<../history/2610/W3/261014/261014_ops_orchid-service-gitops-manifest-onboarding.md>) `orchid:261014_ops_orchid-service-gitops-manifest-onboarding` → [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../history/2610/W3/261014/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` → [🔄 Orchid production overlay 네임스페이스가 클러스터에 없고 staging 이름 규칙과 달라 적용되지 않는 문제 수정](<261014_fix_orchid-production-namespace-name.md>) `orchid:261014_fix_orchid-production-namespace-name` |
+| 파생 | [✅ Orchid 서비스 Hanul GitOps 배포 사용자 실행 검증](<../history/2610/W3/261014/261014_verify_orchid-hanul-gitops-deployment.md>) `orchid:261014_verify_orchid-hanul-gitops-deployment` — 해당 없음 |
+| 착수 조건 | 가능 |
 <!-- plan-relations-summary:end -->
 
 ## 결정이 필요한 사항
@@ -108,7 +118,7 @@ graph LR
 
 ## 단계별 수정 계획
 
-### ⬜ Step 1: production overlay 네임스페이스 이름 변경
+### ✅ Step 1: production overlay 네임스페이스 이름 변경
 
 **파일**: `deploy/k8s/overlays/production/kustomization.yaml`
 
@@ -136,7 +146,7 @@ namespace: orchid-production
 > 프레임워크: Pester 5
 > 패턴: Given/When/Then (Four-Phase Test). 클러스터 접속 없이 `kubectl kustomize` 렌더링 결과만 사용한다.
 
-### ⬜ 테스트용 Stub 정의
+### ✅ 테스트용 Stub 정의
 
 **파일**: `test/Deploy/OrchidNamespaceConvention.Tests.ps1`
 
@@ -157,7 +167,7 @@ BeforeAll {
 }
 ```
 
-### ⬜ 테스트: `OrchidNamespaceConvention.Tests.ps1`
+### ✅ 테스트: `OrchidNamespaceConvention.Tests.ps1`
 
 **파일**: `test/Deploy/OrchidNamespaceConvention.Tests.ps1`
 
@@ -189,10 +199,12 @@ Describe 'Orchid overlay 네임스페이스 규칙' -ForEach @('staging', 'produ
 
 | 범위 | 실행 명령 | 총 테스트 | 통과 | 실패 | 결과 |
 | --- | --- | ---: | ---: | ---: | :---: |
-| 변경 범위 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy/OrchidNamespaceConvention.Tests.ps1"` | — | — | — | ⬜ |
-| 전체 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | — | — | — | ⬜ |
+| 수정 전 (Red) | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy/OrchidNamespaceConvention.Tests.ps1"` | 2 | 1 | 1 | ✅ 의도한 실패 (production 이 `orchid` 로 렌더링) |
+| 변경 범위 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy/OrchidNamespaceConvention.Tests.ps1"` | 2 | 2 | 0 | ✅ |
+| 전체 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | 23 | 23 | 0 | ✅ |
+| 빌드 | `Test-KustomizationBuild.ps1 -KustomizationPath @('deploy/k8s/overlays/staging/kustomization.yaml','deploy/k8s/overlays/production/kustomization.yaml')` | — | — | — | ✅ exit 0. production 렌더링 네임스페이스는 `orchid-production` 하나 |
 
-**실행 일시**: 미실행
+**실행 일시**: 2026-10-15 (run-autopilot `261015-124010`)
 
 <!-- NOTE: 실기기(Android/iOS 디바이스) 조작이나 Staging 수동 검증은 여기에 작성할 수 없습니다. 필요한 경우 별도의 후속 verify 계획서(YYMMDD_verify_*.md)로 분리하십시오. -->
 
@@ -200,8 +212,8 @@ Describe 'Orchid overlay 네임스페이스 규칙' -ForEach @('staging', 'produ
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-production-namespace`가 먼저 반영돼 `orchid-production` 네임스페이스와 ClusterSecretStore 허용이 있어야 한다 | 미확인 |
-| Flux 적용 | 두 계획 반영 후 `orchid-production-controller`가 네임스페이스 오류 없이 다음 단계로 넘어가는지 확인한다 | 미확인 |
+| Garden.Cluster 선행 | `garden-cluster:261014_ops_orchid-production-namespace`가 먼저 반영돼 `orchid-production` 네임스페이스와 ClusterSecretStore 허용이 있어야 한다 | 미충족(2026-10-15, run-autopilot `261015-124010`): 클러스터 네임스페이스 목록에 `orchid-production`이 없고 `lib/Garden.Cluster/docs/planning`·`docs/history`에 Orchid 관련 계획이 없다. 계획 ID `garden-cluster:261014_ops_orchid-production-namespace`는 작성되지 않았다. next gate: Garden.Cluster owner root에 `ops` 계획을 `write-plan`으로 작성해 반영 |
+| Flux 적용 | 두 계획 반영 후 `orchid-production-controller`가 네임스페이스 오류 없이 다음 단계로 넘어가는지 확인한다 | 미확인: 클러스터가 보는 리비전은 `main@a6b80ba`로 이 변경 이전이며 `namespaces "orchid" not found`가 계속된다. 이번 실행은 푸시하지 않아 반영되지 않았다. next gate: 푸시와 위 선행 ops 반영 뒤 `orchid-production-controller` READY 확인 |
 | production 이미지와 시크릿 | 결정 3에 따라 `prod-v1.0.0` 이미지와 `app/prod/orchid/*` 시크릿은 별도 계획에서 다룬다 | 미확인 |
 
 ## 계획 평가
@@ -224,7 +236,7 @@ Describe 'Orchid overlay 네임스페이스 규칙' -ForEach @('staging', 'produ
 
 ## 작업 순서
 
-1. `test/Deploy/OrchidNamespaceConvention.Tests.ps1`을 먼저 작성하고 실패(Red)를 확인한다.
-2. Step 1: production overlay 네임스페이스를 변경한다.
-3. Pester를 통과시킨다.
-4. Garden.Cluster `ops` 계획 반영 후 푸시하고 `orchid-production-controller` 상태를 확인한다.
+1. ✅ `test/Deploy/OrchidNamespaceConvention.Tests.ps1`을 먼저 작성하고 실패(Red)를 확인한다.
+2. ✅ Step 1: production overlay 네임스페이스를 변경한다.
+3. ✅ Pester를 통과시킨다.
+4. ⬜ Garden.Cluster `ops` 계획 반영 후 푸시하고 `orchid-production-controller` 상태를 확인한다.
