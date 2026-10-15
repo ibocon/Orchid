@@ -213,7 +213,7 @@ $Json = bao kv get -format=json secret/infra/harbor/orchid-registry-pull | Conve
 gh secret list --repo ibocon/Orchid
 ```
 
-### ⬜ Step 2: .dockerignore 추가
+### ✅ Step 2: .dockerignore 추가
 
 **파일**: `.dockerignore`
 
@@ -232,7 +232,7 @@ docs/
 **/test/
 ```
 
-### ⬜ Step 3: 서비스별 Dockerfile 추가
+### ✅ Step 3: 서비스별 Dockerfile 추가
 
 **파일**: `src/Service/ApiGateway/Dockerfile`
 
@@ -288,7 +288,7 @@ COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Orchid.Service.Clipboard.dll"]
 ```
 
-### ⬜ Step 4: publish workflow 추가
+### ✅ Step 4: publish workflow 추가
 
 **파일**: `.github/workflows/publish-api-gateway-image.yml`
 
@@ -371,7 +371,7 @@ name: publish-clipboard-image
 # cache scope: clipboard
 ```
 
-### ⬜ Step 5: overlay pull 자격 key 교체
+### ✅ Step 5: overlay pull 자격 key 교체
 
 **파일**: `deploy/k8s/overlays/staging/harbor-registry-external-secret.yaml`
 
@@ -396,7 +396,7 @@ TO-BE:
 
 AS-IS·TO-BE는 staging과 같다.
 
-### ⬜ Step 6: staging 태그를 퍼블리시된 불변 태그로 고정
+### ✅ Step 6: staging 태그를 퍼블리시된 불변 태그로 고정
 
 **파일**: `deploy/k8s/overlays/staging/kustomization.yaml`
 
@@ -427,7 +427,7 @@ images:
 > 프레임워크: Pester 5
 > 패턴: Given/When/Then (Four-Phase Test). 정적 검사는 클러스터·네트워크 없이 실행하고, 이미지 빌드 스모크는 로컬 Docker로 push 없이 실행한다.
 
-### ⬜ 테스트용 Stub 정의
+### ✅ 테스트용 Stub 정의
 
 **파일**: `test/Deploy/OrchidImagePublish.Tests.ps1`
 
@@ -448,7 +448,7 @@ BeforeAll {
 }
 ```
 
-### ⬜ 테스트: `OrchidImagePublish.Tests.ps1`
+### ✅ 테스트: `OrchidImagePublish.Tests.ps1`
 
 **파일**: `test/Deploy/OrchidImagePublish.Tests.ps1`
 
@@ -545,10 +545,11 @@ Harbor API(`Invoke-HarborApi`), OpenBao(`Get-OpenBaoKvData`·`Set-OpenBaoKvData`
 | --- | --- | ---: | ---: | ---: | :---: |
 | 하네스 스크립트 | `pwsh -NoProfile -Command "Invoke-Pester lib/Garden.Harness/src/kubernetes/test/HarborProjectRobot.Tests.ps1"` | 11 | 11 | 0 | ✅ |
 | 실 Harbor dry-run | `New-HarborProjectRobot.ps1 ... -WhatIf` (GET만 수행. 대조: `garden#2`, `robot$garden+garden-pull-flux-20260912153851` 조회 성공) | — | — | — | ✅ exit 0, `project/orchid`·robot 2개 `WouldCreate` |
-| 수정 전 (Red) | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | — | — | — | ⬜ |
-| 변경 범위 | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | — | — | — | ⬜ |
-| 이미지 빌드 스모크 | `docker build -f src/Service/ApiGateway/Dockerfile .` / `docker build -f src/Service/Clipboard/Dockerfile .` (push 없음) | — | — | — | ⬜ |
-| 전체 | `Test-KustomizationBuild.ps1 -KustomizationPath @('deploy/k8s/overlays/staging/kustomization.yaml','deploy/k8s/overlays/production/kustomization.yaml')` | — | — | — | ⬜ |
+| 수정 전 (Red) | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | 21 | 12 | 9 | ✅ 의도한 실패 (workflow 2, Dockerfile 2, pull 자격 4, 불변 태그 1) |
+| 변경 범위 (Step 2~5) | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | 21 | 20 | 1 | ⚠️ 남은 1건은 Step 6 불변 태그 테스트(퍼블리시 후 고정) |
+| 변경 범위 (Step 6 후) | `pwsh -NoProfile -Command "Invoke-Pester test/Deploy"` | 21 | 21 | 0 | ✅ |
+| 이미지 빌드 스모크 | `docker build -f src/Service/{ApiGateway,Clipboard}/Dockerfile .` | — | — | — | ⚠️ 로컬 Docker Desktop 엔진이 buildkit 이미지 pull 에 500 을 반환해 실행 불가. 대체: `dotnet publish -c Release /p:UseAppHost=false` 두 서비스 exit 0. 실제 이미지 빌드는 workflow 실행으로 확인 |
+| 전체 | `Test-KustomizationBuild.ps1 -KustomizationPath @('deploy/k8s/overlays/staging/kustomization.yaml','deploy/k8s/overlays/production/kustomization.yaml')` | — | — | — | ✅ exit 0 |
 
 <!-- NOTE: Staging 수동 검증은 orchid:261014_verify_orchid-hanul-gitops-deployment 의 V2·V3 로 이관한다. -->
 
@@ -557,8 +558,8 @@ Harbor API(`Invoke-HarborApi`), OpenBao(`Get-OpenBaoKvData`·`Set-OpenBaoKvData`
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
 | 자격 준비 | Step 1 결과로 OpenBao `infra/harbor/orchid-registry-pull`의 auths 호스트와 `gh secret list`의 `HARBOR_*` 3개를 확인한다 | 확인(2026-10-14 20:43 KST, 스크립트 exit 0): Harbor `orchid`(id 35, 비공개) 생성. `robot$orchid+orchid-pull-flux`(repository.pull), `robot$orchid+ci-push`(repository push·pull, artifact read, tag create), 만료 2027-10-14. OpenBao auths 호스트 `harbor.hanul.botanicsoft.com`, username `robot$orchid+orchid-pull-flux`. GitHub `HARBOR_REGISTRY`·`HARBOR_USERNAME`·`HARBOR_PASSWORD` 등록. registry token에 `repository:orchid/api-gateway:pull` 부여 확인(이미지가 없어 tags/list 404) |
-| workflow 실행 | `Invoke-WorkflowDispatch.ps1`로 `publish-api-gateway-image.yml`, `publish-clipboard-image.yml`을 `main`에서 실행해 성공과 Summary 태그를 확인한다 | 미확인 |
-| pull 자격 동기화 | `orchid-staging/harbor-registry`가 새 key로 `SecretSynced`인지 확인한다 | 미확인 |
+| workflow 실행 | `Invoke-WorkflowDispatch.ps1`로 `publish-api-gateway-image.yml`, `publish-clipboard-image.yml`을 `main`에서 실행해 성공과 Summary 태그를 확인한다 | 확인(2026-10-15, `main@0a80f65`): run `38669605760`(api-gateway) success, `stag-20261015021051-0a80f65`. run `38669763685`(clipboard) success, `stag-20261015021237-0a80f65`. pull robot 토큰으로 Harbor `tags/list` 조회 시 두 저장소에 `sha-0a80f65`와 stag 태그가 있다 |
+| pull 자격 동기화 | `orchid-staging/harbor-registry`가 새 key로 `SecretSynced`인지 확인한다 | 확인(2026-10-15, `main@0a80f65`): generation 2, `remoteRef.key: infra/harbor/orchid-registry-pull`, `SecretSynced` True |
 | Pod 기동 | Step 6 푸시 후 Pod 2개 `Running 1/1`, `/health` 200을 확인한다. 앱 시크릿 `PLACEHOLDER` 외 필수 key가 있으면 이 단계에서 드러난다 | 미확인 |
 | 경보 해소 | `KubePodNotReady`, `KubeDeploymentReplicasMismatch`가 resolved 되는지 Prometheus `ALERTS`로 확인한다. 확인 후 `orchid:261014_fix_orchid-harbor-image-pull-secret`의 "이미지 존재", "경보 해소"를 함께 닫는다 | 미확인 |
 | production | production은 `namespaces "orchid" not found`로 아직 적용되지 않는다. 태그 승격은 `promote-environment` 범위 | 범위 밖 |
@@ -586,9 +587,9 @@ Harbor API(`Invoke-HarborApi`), OpenBao(`Get-OpenBaoKvData`·`Set-OpenBaoKvData`
 ## 작업 순서
 
 1. ✅ Step 1: `New-HarborProjectRobot.ps1`과 테스트를 작성하고 `-WhatIf`를 사용자에게 보인 뒤, 승인 시 실행해 자격을 준비한다. 에이전트가 read-only로 결과를 확인한다.
-2. ⬜ `OrchidImagePublish.Tests.ps1`을 작성하고 기존 테스트 기대값을 갱신해 실패(Red)를 확인한다.
-3. ⬜ Step 2~4: `.dockerignore`, Dockerfile 2개, workflow 2개를 추가하고 로컬 `docker build` 스모크를 통과시킨다.
-4. ⬜ Step 5: overlay pull 자격 key를 교체한다.
-5. ⬜ 커밋·푸시 후 workflow 2개를 dispatch해 불변 태그를 얻는다.
-6. ⬜ Step 6: staging `newTag`를 고정하고 Pester·`Test-KustomizationBuild.ps1`을 통과시킨 뒤 푸시한다.
+2. ✅ `OrchidImagePublish.Tests.ps1`을 작성하고 기존 테스트 기대값을 갱신해 실패(Red)를 확인한다.
+3. ✅ Step 2~4: `.dockerignore`, Dockerfile 2개, workflow 2개를 추가하고 로컬 `docker build` 스모크를 통과시킨다.
+4. ✅ Step 5: overlay pull 자격 key를 교체한다.
+5. ✅ 커밋·푸시 후 workflow 2개를 dispatch해 불변 태그를 얻는다.
+6. ✅ Step 6: staging `newTag`를 고정하고 Pester·`Test-KustomizationBuild.ps1`을 통과시킨 뒤 푸시한다.
 7. ⬜ 후속 검증을 수행하고 `orchid:261014_fix_orchid-harbor-image-pull-secret`을 닫는다.

@@ -8,6 +8,6 @@ resources:
   - ingress.yaml
 images:
   - name: harbor.hanul.botanicsoft.com/orchid/api-gateway
-    newTag: stag-dev
+    newTag: stag-20261015021051-0a80f65
   - name: harbor.hanul.botanicsoft.com/orchid/clipboard
-    newTag: stag-dev
+    newTag: stag-20261015021237-0a80f65
