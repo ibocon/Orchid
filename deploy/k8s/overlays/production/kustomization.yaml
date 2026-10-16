@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: orchid-production
 resources:
   - ../../base
+  - service-account.yaml
+  - secret-store.yaml
   - external-secret.yaml
   - harbor-registry-external-secret.yaml
   - ingress.yaml
