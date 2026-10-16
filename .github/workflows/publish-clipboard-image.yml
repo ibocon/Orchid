@@ -7,9 +7,14 @@ on:
         description: 'Git ref to build (branch, tag, or full SHA). Defaults to the dispatch ref.'
         required: false
         default: ''
+      promote-staging:
+        description: 'Commit the published tag to the staging overlay.'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: publish-clipboard-${{ github.event.inputs.ref || github.ref }}
@@ -22,4 +27,5 @@ jobs:
       service: clipboard
       dockerfile: src/Service/Clipboard/Dockerfile
       ref: ${{ github.event.inputs.ref }}
+      promote-staging: ${{ github.event.inputs.promote-staging != 'false' }}
     secrets: inherit

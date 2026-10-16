@@ -99,4 +99,26 @@ Describe 'Orchid 이미지 퍼블리시 경로' {
         $Digests | Should -HaveCount 2
         $Digests | Should -Not -Contain 'sha256:prod-v1.0.0'
     }
+
+    It 'Given 재사용 workflow, When 내용 확인, Then publish 뒤에 단일 concurrency 로 staging 태그를 커밋한다' {
+        # Given
+        $Shared = Get-RepositoryFile -RelativePath '.github/workflows/publish-service-image.yml'
+
+        # When / Then
+        $Shared | Should -Match '(?m)^  promote-staging:'
+        $Shared | Should -Match 'needs: publish'
+        $Shared | Should -Match 'contents: write'
+        $Shared | Should -Match 'group: orchid-staging-tag-promotion'
+        $Shared | Should -Match 'deploy/scripts/Set-OverlayImageTag\.ps1'
+        $Shared | Should -Match 'deploy/k8s/overlays/staging/kustomization\.yaml'
+    }
+
+    It 'Given <Name> 호출 workflow, When 내용 확인, Then promote-staging 입력을 전달하고 contents write 를 부여한다' -ForEach $script:Services {
+        # Given
+        $Caller = Get-RepositoryFile -RelativePath $Workflow
+
+        # When / Then
+        $Caller | Should -Match 'promote-staging:'
+        $Caller | Should -Match 'contents: write'
+    }
 }
