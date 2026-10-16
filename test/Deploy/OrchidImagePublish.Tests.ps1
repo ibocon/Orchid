@@ -40,14 +40,17 @@ BeforeAll {
 Describe 'Orchid 이미지 퍼블리시 경로' {
     It 'Given <Name> 서비스, When workflow 확인, Then orchid 프로젝트로 불변 태그를 push 한다' -ForEach $script:Services {
         # Given
-        $Content = Get-RepositoryFile -RelativePath $Workflow
+        $Shared = Get-RepositoryFile -RelativePath '.github/workflows/publish-service-image.yml'
+        $Caller = Get-RepositoryFile -RelativePath $Workflow
 
         # When / Then
-        $Content | Should -Match "/orchid/$Name"
-        $Content | Should -Match 'stag-\$\{BUILD_STAMP\}-\$\{SHORT_SHA\}'
-        $Content | Should -Match "file: $([regex]::Escape($Dockerfile))"
-        $Content | Should -Match 'runs-on: ubuntu-latest'
-        $Content | Should -Not -Match 'hanul-linux'
+        $Shared | Should -Match '/orchid/\$\{\{ inputs\.service \}\}'
+        $Shared | Should -Match 'stag-\$\{BUILD_STAMP\}-\$\{SHORT_SHA\}'
+        $Shared | Should -Match 'runs-on: ubuntu-latest'
+        $Shared | Should -Not -Match 'hanul-linux'
+        $Caller | Should -Match "service: $Name"
+        $Caller | Should -Match "dockerfile: $([regex]::Escape($Dockerfile))"
+        $Caller | Should -Not -Match 'hanul-linux'
     }
 
     It 'Given <Name> 서비스, When Dockerfile 확인, Then 8080 을 노출하고 비루트로 실행한다' -ForEach $script:Services {

@@ -6,8 +6,9 @@ resources:
   - service-account.yaml
   - secret-store.yaml
   - external-secret.yaml
-  - harbor-registry-external-secret.yaml
   - ingress.yaml
+components:
+  - ../../components/harbor-registry
 images:
   - name: harbor.hanul.botanicsoft.com/orchid/api-gateway
     newTag: stag-20261015021051-0a80f65
