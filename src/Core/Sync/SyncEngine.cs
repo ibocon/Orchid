@@ -14,6 +14,11 @@ namespace Orchid.Core.Sync;
 /// </summary>
 public sealed class SyncEngine : ISyncEngine
 {
+    /// <summary>
+    /// 이미 처리한 내용이라 건너뛰었음을 나타내는 오류입니다.
+    /// </summary>
+    public static readonly Error DuplicateContent = new("Sync.Duplicate", "Duplicate clipboard content already processed.");
+
     private readonly IAesGcmCryptoService _cryptoService;
     private readonly IClipboardRepository _repository;
 
@@ -37,7 +42,7 @@ public sealed class SyncEngine : ISyncEngine
         string hash = PayloadHash.FromString(plainText).Value;
         if (await _repository.ExistsByHashAsync(hash).ConfigureAwait(false))
         {
-            return Result<EncryptedPayload>.Failure("Duplicate clipboard content already processed.");
+            return Result<EncryptedPayload>.Failure(DuplicateContent);
         }
 
         byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);

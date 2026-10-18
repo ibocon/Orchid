@@ -15,6 +15,18 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Desktop과 같은 기본값과 같은 덮어쓰기 규칙 -->
+    <OrchidRelayUrl Condition="'$(OrchidRelayUrl)' == ''">https://orchid.stag.botanicsoft.com</OrchidRelayUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>OrchidRelayUrl</_Parameter1>
+      <_Parameter2>$(OrchidRelayUrl)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Core\Orchid.Core.csproj" />
   </ItemGroup>

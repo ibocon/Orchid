@@ -9,12 +9,28 @@ namespace Orchid.Service.Clipboard.Infrastructure.Realtime;
 public sealed class ClipboardHub : Hub
 {
     /// <summary>
-    /// 클라이언트가 E2EE 암호화된 페이로드를 허브로 전송할 때 호출됩니다.
+    /// 연결을 페어링 그룹에 가입시킵니다.
     /// </summary>
-    /// <param name="payload">암호화된 클립보드 페이로드</param>
-    public async Task SendClipboard(EncryptedPayload payload)
+    /// <param name="pairingId">페어링 키의 SHA-256 해시 16진 문자열</param>
+    public async Task JoinPairing(string pairingId)
     {
-        // 발신자를 제외한 동일 계정의 다른 연결된 디바이스로 브로드캐스트
-        await Clients.Others.SendAsync("OnClipboardReceived", payload).ConfigureAwait(false);
+        ArgumentException.ThrowIfNullOrWhiteSpace(pairingId);
+        await
+            Groups.AddToGroupAsync(Context.ConnectionId, pairingId)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 같은 페어링 그룹의 다른 디바이스로 E2EE 암호화된 페이로드를 중계합니다.
+    /// </summary>
+    /// <param name="pairingId">대상 페어링 그룹</param>
+    /// <param name="payload">암호화된 클립보드 페이로드</param>
+    public async Task SendClipboard(string pairingId, EncryptedPayload payload)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(pairingId);
+        ArgumentNullException.ThrowIfNull(payload);
+        await
+            Clients.OthersInGroup(pairingId).SendAsync("OnClipboardReceived", payload)
+            .ConfigureAwait(false);
     }
 }

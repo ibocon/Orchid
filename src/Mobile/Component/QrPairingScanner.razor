@@ -4,17 +4,27 @@
     <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner" Size="MudSize.Large" Color="Color.Primary" />
     <MudText Typo="Typo.subtitle1">디바이스 페어링</MudText>
     <MudText Typo="Typo.body2" Color="Color.Secondary">
-        데스크톱 화면에 표시된 페어링 QR 코드를 스캔하세요.
+        데스크톱 화면에 표시된 페어링 키를 입력하세요.
     </MudText>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CameraAlt">
-        카메라 스캔 시작
+    <MudTextField T="string" @bind-Value="_manualKey" Label="페어링 키 직접 입력" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Link" OnClick="SubmitAsync">
+        연결
     </MudButton>
 </MudPaper>
 
 @code {
+    private string? _manualKey;
+
     /// <summary>
-    /// QR 코드 스캔 성공 시 페어링 키를 전달하는 콜백
+    /// QR 코드 스캔 또는 수동 입력 성공 시 페어링 키를 전달하는 콜백
     /// </summary>
     [Parameter]
     public EventCallback<string> OnQrScanned { get; set; }
+
+    private Task SubmitAsync()
+    {
+        return string.IsNullOrWhiteSpace(_manualKey)
+            ? Task.CompletedTask
+            : OnQrScanned.InvokeAsync(_manualKey.Trim());
+    }
 }

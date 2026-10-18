@@ -9,10 +9,20 @@
 <MudLayout>
     <MobileHeader />
     <MudMainContent Class="pa-3">
-        <QrPairingScanner />
+        <QrPairingScanner OnQrScanned="StartRelayAsync" />
     </MudMainContent>
 </MudLayout>
 
 @code {
     private OrchidMobileDesignSystemProvider? _provider;
+
+    private Task StartRelayAsync(string payload)
+    {
+#if ANDROID
+        Android.Content.Intent intent = new(Android.App.Application.Context, typeof(Orchid.Mobile.Platforms.Android.RelayForegroundService));
+        intent.PutExtra(Orchid.Mobile.Platforms.Android.RelayForegroundService.ExtraPairingPayload, payload);
+        Android.App.Application.Context.StartForegroundService(intent);
+#endif
+        return Task.CompletedTask;
+    }
 }
