@@ -78,9 +78,51 @@ public sealed class ClipboardSyncCoordinatorTests
         clipboard.Text.Should().BeNull();
     }
 
-    private static (ClipboardSyncCoordinator Sut, FakeRelayClient Relay, FakeClipboard Clipboard, FakeChangeSource Source) CreateSut()
+    [Fact]
+    public async Task StartAsync_When_Connect_Pending_Should_Start_Change_Source_On_Caller_Thread_Before_Connect_Completes()
+    {
+        // Given
+        PairingKey key = PairingKey.Generate();
+        (ClipboardSyncCoordinator sut, FakeRelayClient relay, _, FakeChangeSource source) = CreateSut(completeConnect: false);
+
+        // When
+        Task start = sut.StartAsync(key, Guid.NewGuid());
+
+        // Then
+        start.IsCompleted.Should().BeFalse();
+        source.StartedOnThreadId.Should().Be(Environment.CurrentManagedThreadId);
+
+        relay.ConnectGate.SetResult();
+        await start;
+    }
+
+    [Fact]
+    public async Task OnLocalChange_When_Raised_Before_Connect_Completes_Should_Send_After_Connect()
+    {
+        // Given
+        PairingKey key = PairingKey.Generate();
+        (ClipboardSyncCoordinator sut, FakeRelayClient relay, FakeClipboard clipboard, FakeChangeSource source) = CreateSut(completeConnect: false);
+        Task start = sut.StartAsync(key, Guid.NewGuid());
+        clipboard.Text = "early copy";
+        Task changed = source.RaiseChangedAsync();
+
+        // When
+        relay.ConnectGate.SetResult();
+        await start;
+        await changed;
+
+        // Then
+        relay.Sent.Should().ContainSingle();
+    }
+
+    private static (ClipboardSyncCoordinator Sut, FakeRelayClient Relay, FakeClipboard Clipboard, FakeChangeSource Source) CreateSut(bool completeConnect = true)
     {
         FakeRelayClient relay = new();
+        if (completeConnect)
+        {
+            relay.ConnectGate.SetResult();
+        }
+
         FakeClipboard clipboard = new();
         FakeChangeSource source = new();
         SyncEngine engine = new(new AesGcmCryptoService(), InMemoryRepository.Create());

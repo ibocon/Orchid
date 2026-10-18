@@ -11,11 +11,13 @@ internal sealed class FakeRelayClient : IClipboardRelayClient
 {
     public List<(string PairingId, EncryptedPayload Payload)> Sent { get; } = [];
 
+    public TaskCompletionSource ConnectGate { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     public event Func<EncryptedPayload, Task>? PayloadReceived;
 
     public Task ConnectAsync(string pairingId, CancellationToken cancellationToken = default)
     {
-        return Task.CompletedTask;
+        return ConnectGate.Task;
     }
 
     public Task SendAsync(string pairingId, EncryptedPayload payload, CancellationToken cancellationToken = default)
@@ -53,10 +55,13 @@ internal sealed class FakeClipboard : ISystemClipboard
 
 internal sealed class FakeChangeSource : IClipboardChangeSource
 {
+    public int? StartedOnThreadId { get; private set; }
+
     public event Func<Task>? Changed;
 
     public void Start()
     {
+        StartedOnThreadId = Environment.CurrentManagedThreadId;
     }
 
     public Task RaiseChangedAsync()

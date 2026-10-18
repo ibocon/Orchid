@@ -14,6 +14,7 @@ public sealed class ClipboardSyncCoordinator : IAsyncDisposable
     private readonly ISystemClipboard _clipboard;
     private readonly IClipboardChangeSource _changeSource;
     private readonly IClipboardRelayClient _relay;
+    private readonly TaskCompletionSource _ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private PairingKey? _pairingKey;
     private Guid _deviceId;
 
@@ -51,10 +52,22 @@ public sealed class ClipboardSyncCoordinator : IAsyncDisposable
 
         _relay.PayloadReceived += OnRemoteReceivedAsync;
         _changeSource.Changed += OnLocalChangedAsync;
-        await
-            _relay.ConnectAsync(pairingKey.PairingId, cancellationToken)
-            .ConfigureAwait(false);
+
+        // 첫 await 전에 호출해 호출자(UI) 스레드에서 변경 감시를 시작한다. 창 서브클래싱은 창을 만든 스레드에서만 성공한다.
         _changeSource.Start();
+
+        try
+        {
+            await
+                _relay.ConnectAsync(pairingKey.PairingId, cancellationToken)
+                .ConfigureAwait(false);
+            _ready.SetResult();
+        }
+        catch (Exception exception)
+        {
+            _ready.TrySetException(exception);
+            throw;
+        }
     }
 
     /// <inheritdoc />
@@ -67,6 +80,11 @@ public sealed class ClipboardSyncCoordinator : IAsyncDisposable
 
     private async Task OnLocalChangedAsync()
     {
+        // 연결이 끝나기 전에 발생한 변경은 연결 완료까지 기다린다.
+        await
+            _ready.Task
+            .ConfigureAwait(false);
+
         PairingKey? pairingKey = _pairingKey;
         string? text = await
             _clipboard.GetTextAsync()
