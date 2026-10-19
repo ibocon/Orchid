@@ -3,8 +3,8 @@
 BeforeAll {
     $script:RepositoryRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '../..')).Path
     $script:AllowedKeys = @(
-        'app/stag/orchid/api-gateway'
-        'app/stag/orchid/clipboard'
+        'app/orchid/stag/api-gateway'
+        'app/orchid/stag/clipboard'
         'infra/harbor/orchid-registry-pull'
     )
 

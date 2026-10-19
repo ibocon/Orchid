@@ -1,4 +1,4 @@
-using Orchid.Core.Abstraction;
+using Orchid.Core.Notification;
 
 namespace Orchid.Mobile.Service;
 

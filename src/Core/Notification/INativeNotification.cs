@@ -1,4 +1,4 @@
-namespace Orchid.Core.Abstraction;
+namespace Orchid.Core.Notification;
 
 /// <summary>
 /// 네이티브 OS 토스트 알림 또는 시스템 배너 표시 인터페이스입니다.
