@@ -13,4 +13,4 @@ images:
   - name: harbor.hanul.botanicsoft.com/orchid/api-gateway
     newTag: stag-20261016074004-614f3b4
   - name: harbor.hanul.botanicsoft.com/orchid/clipboard
-    newTag: stag-20261018094611-9f10579
+    newTag: stag-20261019021027-ddb68b5
